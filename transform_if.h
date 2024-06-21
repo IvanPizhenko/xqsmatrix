@@ -26,6 +26,8 @@
 #ifndef TRANSFORM_IF_H__
 #define TRANSFORM_IF_H__
 
+namespace stdx {
+
 template< class InputIt, class OutputIt, class UnaryOperation, class UnaryPredicate>
 OutputIt transform_if(InputIt first1, InputIt last1, OutputIt d_first,
                       UnaryOperation unary_op, UnaryPredicate pred)
@@ -38,5 +40,7 @@ OutputIt transform_if(InputIt first1, InputIt last1, OutputIt d_first,
     }
     return d_first;
 }
+
+// namespace stdx
 
 #endif // TRANSFORM_IF_H__
