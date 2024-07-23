@@ -1,8 +1,4 @@
-// https://github.com/ivanp2015/xqsmatrix/transform_if.h
-//
-// License terms:
-//
-// Copyright © 2018 Ivan Pizhenko. All rights reserved.
+// Copyright © 2018, 2024 Ivan Pizhenko. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//
 
 #ifndef TRANSFORM_IF_H__
 #define TRANSFORM_IF_H__
@@ -41,6 +36,6 @@ OutputIt transform_if(InputIt first, InputIt last, OutputIt d_first,
     return d_first;
 }
 
-// namespace stdx
+} // namespace stdx
 
 #endif // TRANSFORM_IF_H__

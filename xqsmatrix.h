@@ -1,4 +1,3 @@
-//
 // This is slightly modified version of public available QSMatix class,
 // described in these articles:
 // https://www.quantstart.com/articles/Matrix-Classes-in-C-The-Header-File
@@ -67,18 +66,18 @@
 // - added operator[] and new versions of method at() to access individual rows
 //
 // Changes are maintained on the GitHub:
-// https://github.com/ivanp2015/xqsmatrix
+// https://github.com/IvanPizhenko/xqsmatrix
 //
 // License terms for modifications:
 //
 // Copyright © 2015-2017, 2018, 2020, 2024 Ivan Pizhenko
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
 //
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
@@ -87,13 +86,12 @@
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 
-#ifndef XQSMATRIX_H
-#define XQSMATRIX_H
+#ifndef XQSMATRIX_H__
+#define XQSMATRIX_H__
 
 #include <cmath>
 #include <fstream>
@@ -105,7 +103,6 @@
 template <typename T>
 class XQSMatrix {
 private:
-
 	std::size_t m_nrows;
 	std::size_t m_ncols;
 	std::vector<std::vector<T>> m_mat;
@@ -130,7 +127,6 @@ private:
 	std::vector<size_t> gaussian_reduction();
 
 public:
-
 	// Constructors
 	explicit XQSMatrix(std::size_t nrows = 1, std::size_t ncols = 1);
 	XQSMatrix(std::size_t nrows, std::size_t ncols, const T& v);
@@ -181,7 +177,8 @@ public:
 	// Scalar product of the row with a given vector
 	T row_scalar_product(std::size_t row_index, const std::vector<T>& v) const;
 	// Scalar product of the column with a given vector
-	T column_scalar_product(std::size_t col_index, const std::vector<T>& v) const;
+	T column_scalar_product(
+		std::size_t col_index, const std::vector<T>& v) const;
 	
 	// Add "count" columns at postion "pos" with inital value "v"
 	void add_columns(std::size_t pos, std::size_t count, const T& v);
@@ -321,16 +318,22 @@ XQSMatrix<T> XQSMatrix<T>::identity(std::size_t n, const T& k)
 
 // Swap matrices
 template <typename T>
-inline void XQSMatrix<T>::swap(XQSMatrix<T> &other) noexcept
+void XQSMatrix<T>::swap(XQSMatrix<T> &other) noexcept
 {
 	std::swap(m_nrows, other.m_nrows);
 	std::swap(m_ncols, other.m_ncols);
 	m_mat.swap(other.m_mat);
 }
 
+template <typename T>
+inline void swap(XQSMatrix<T> &a, XQSMatrix<T> &b) noexcept
+{
+	a.swap(b);
+}
+
 // Assignment Operator
 template <typename T>
-inline XQSMatrix<T> &XQSMatrix<T>::operator=(const XQSMatrix<T> &rhs)
+XQSMatrix<T> &XQSMatrix<T>::operator=(const XQSMatrix<T> &rhs)
 {
 	if (&rhs == this) {
 		m_mat = rhs.m_mat;
@@ -359,7 +362,7 @@ XQSMatrix<T>& XQSMatrix<T>::operator=(XQSMatrix<T>&& rhs)
 
 // Addition of two matrices
 template <typename T>
-inline XQSMatrix<T> XQSMatrix<T>::operator+(const XQSMatrix<T>&rhs) const
+XQSMatrix<T> XQSMatrix<T>::operator+(const XQSMatrix<T>&rhs) const
 {
 	check_equal_dimensions(rhs);
 	XQSMatrix result(m_nrows, m_ncols);
@@ -391,7 +394,7 @@ XQSMatrix<T> &XQSMatrix<T>::operator+=(const XQSMatrix<T> &rhs)
 
 // Subtraction of this matrix and another
 template <typename T>
-inline XQSMatrix<T> XQSMatrix<T>::operator-(const XQSMatrix<T> &rhs)const
+XQSMatrix<T> XQSMatrix<T>::operator-(const XQSMatrix<T> &rhs)const
 {
 	check_equal_dimensions(rhs);
 	XQSMatrix result(m_nrows, m_ncols);
@@ -442,7 +445,7 @@ XQSMatrix<T> XQSMatrix<T>::operator*(const XQSMatrix<T>& rhs) const
 
 // Cumulative left multiplication of this matrix and another
 template <typename T>
-inline XQSMatrix<T> &XQSMatrix<T>::operator*=(const XQSMatrix<T> &rhs)
+XQSMatrix<T> &XQSMatrix<T>::operator*=(const XQSMatrix<T> &rhs)
 {
 	XQSMatrix result = (*this) * rhs;
 	swap(result);
@@ -616,8 +619,7 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 				throw std::runtime_error("Matrix can't be inverted 5");
 			}
 			pi0 /= c[index[i]];
-			if (pi0 > pi1) 
-			{
+			if (pi0 > pi1) {
 				pi1 = pi0;
 				k = i;
 			}
@@ -641,8 +643,9 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 			v2 = pj;
 
 			// Modify other elements accordingly
-			for (size_t l = j + 1; l < N; ++l)
+			for (size_t l = j + 1; l < N; ++l) {
 				row[l] -= pj * row0[l];
+			}
 		}
 	}
 	return index;
@@ -775,7 +778,8 @@ XQSMatrix<T> XQSMatrix<T>::mul_by_row(const std::vector<T>& row_data) const
 		throw std::logic_error("Empty column data");
 	}
 	if (m_ncols != 1) {
-		throw std::logic_error("Matrix dimensions mismatch for product with vector row");
+		throw std::logic_error(
+			"Matrix dimensions mismatch for product with vector row");
 	}
 
 	// Compute product
@@ -792,11 +796,13 @@ XQSMatrix<T> XQSMatrix<T>::mul_by_row(const std::vector<T>& row_data) const
 
 // Multiply a matrix with a vector representing single column
 template <typename T>
-std::vector<T> XQSMatrix<T>::mul_by_column(const std::vector<T>& column_data) const
+std::vector<T> XQSMatrix<T>::mul_by_column(
+	const std::vector<T>& column_data) const
 {
 	// Validate parameters
 	if (m_ncols != column_data.size()) {
-		throw std::invalid_argument("Input vector size mismatch for product with vector column");
+		throw std::invalid_argument(
+			"Input vector size mismatch for product with vector column");
 	}
 
 	// Compute product
@@ -804,7 +810,7 @@ std::vector<T> XQSMatrix<T>::mul_by_column(const std::vector<T>& column_data) co
 	for (std::size_t i = 0; i < m_nrows; i++) {
 		const auto& row = m_mat[i];
 		for (std::size_t j = 0; j < m_ncols; j++) {
-				result[i] += row[j] * column_data[j];
+			result[i] += row[j] * column_data[j];
 		}
 	}
 	return result;
@@ -812,11 +818,14 @@ std::vector<T> XQSMatrix<T>::mul_by_column(const std::vector<T>& column_data) co
 
 // Scalar product of the row with a given vector
 template <typename T>
-T XQSMatrix<T>::row_scalar_product(std::size_t row_index, const std::vector<T>& v) const
+T XQSMatrix<T>::row_scalar_product(
+	std::size_t row_index,
+	const std::vector<T>& v) const
 {
 	validate_row_index(row_index);
 	if (v.size() != m_ncols) {
-		throw std::invalid_argument("Input vector size mismatch for row scalar product");
+		throw std::invalid_argument(
+			"Input vector size mismatch for row scalar product");
 	}
 	T result = 0;
 	const auto& row = m_mat[row_index];
@@ -828,11 +837,14 @@ T XQSMatrix<T>::row_scalar_product(std::size_t row_index, const std::vector<T>& 
 
 // Scalar product of the column with a given vector
 template <typename T>
-T XQSMatrix<T>::column_scalar_product(std::size_t col_index, const std::vector<T>& v) const
+T XQSMatrix<T>::column_scalar_product(
+	std::size_t col_index,
+	const std::vector<T>& v) const
 {
 	validate_column_index(col_index);
 	if (v.size() != m_nrows) {
-		throw std::invalid_argument("Input vector size mismatch for column scalar product");
+		throw std::invalid_argument(
+			"Input vector size mismatch for column scalar product");
 	}
 	T result = 0;
 	for (std::size_t i = 0; i < m_ncols; ++i) {
@@ -861,7 +873,8 @@ void XQSMatrix<T>::remove_columns(std::size_t pos, std::size_t count)
 		throw std::out_of_range("Removal count is out of range");
 	}
 	if (m_ncols == 1) {
-		throw std::logic_error("Can't remove column from matrix with single column");
+		throw std::logic_error(
+			"Can't remove column from matrix with single column");
 	}
 	for (auto& row: m_mat) {
 		auto it = row.begin() + pos;
@@ -992,8 +1005,7 @@ XQSMatrix<T> XQSMatrix<T>::readCsv(const std::string & path, char lineEnding,
 		if (result.m_ncols != row.size()) {
 			if (result.m_ncols < row.size()) {
 				result.set_col_count(row.size());
-			}
-			else {
+			} else {
 				row.resize(result.m_ncols);
 			}
 		}
@@ -1035,11 +1047,12 @@ std::vector<T> XQSMatrix<T>::tokenizeAndParse(const std::string& str,
 
 // Check that matrix has equal dimensions
 template <typename T>
-inline void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T> &other) const
+void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T> &other) const
 {
 	if (m_nrows != other.m_nrows && m_ncols != other.m_ncols) {
 		std::ostringstream err;
-		err << "Dimensions of the other matrix differ (this vs other (rows*cols): "
+		err << "Dimensions of the other matrix differ "
+				"(this vs other (rows*cols): "
 			<< m_nrows << "*" << m_ncols << " vs " << other.m_nrows << "*" 
 			<< other.m_ncols << ")"; 
 		throw std::invalid_argument(err.str());
@@ -1047,13 +1060,14 @@ inline void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T> &other) cons
 }
 
 template <typename T>
-inline void XQSMatrix<T>::check_suitable_for_product(const XQSMatrix<T> &other) const
+void XQSMatrix<T>::check_suitable_for_product(const XQSMatrix<T> &other) const
 {
 	if (m_ncols != other.m_nrows) {
 		std::ostringstream err;
-		err << "Dimensions of the other matrix are not suitable for the product "
-			"this*other (this vs other (rows*cols): " << m_nrows << "*"
-			<< m_ncols << " vs " << other.m_nrows << "*" << other.m_ncols << ")"; 
+		err << "Dimensions of the other matrix are not suitable for the"
+			" product this*other (this vs other (rows*cols): "
+			<< m_nrows << "*" << m_ncols << " vs " << other.m_nrows << "*"
+			<< other.m_ncols << ")"; 
 		throw std::invalid_argument(err.str());
 	}
 }
@@ -1075,7 +1089,8 @@ void XQSMatrix<T>::validate_column_index(std::size_t index) const
 }
 
 template<class T, class CharT = char, class Traits = std::char_traits<CharT>>
-std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
+std::basic_ostream<CharT, Traits>& operator<<(
+	std::basic_ostream<CharT, Traits>& os,
 	const XQSMatrix<T>& matrix)
 {
 	typename std::basic_ostream<CharT, Traits>::sentry sentry(os);
@@ -1095,4 +1110,4 @@ std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>&
 	return os;
 }
 
-#endif
+#endif // XQSMATRIX_H__
