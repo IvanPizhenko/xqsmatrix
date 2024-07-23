@@ -100,6 +100,30 @@
 #include <sstream>
 #include <vector>
 
+
+// Tokenize string and parse tokens as matrix cell values.
+// This code is based on the public domain code taken from here:
+// https://stackoverflow.com/a/1493195/1540501
+template <typename T, typename Converter>
+std::vector<T> tokenizeAndParse(const std::string& str,
+	const Converter& converter, const std::string& delimiters = " ",
+	bool trimEmpty = false)
+{
+	std::vector<T> result;
+	std::string::size_type pos, lastPos = 0, length = str.length();
+	while (lastPos < length + 1) {
+		pos = str.find_first_of(delimiters, lastPos);
+		if (pos == std::string::npos) {
+			pos = length;
+		}
+		if (pos != lastPos || !trimEmpty) {
+			result.push_back(converter(str.substr(lastPos, pos - lastPos)));
+		}
+		lastPos = pos + 1;
+	}
+	return result;
+}
+
 template <typename T>
 class XQSMatrix {
 private:
@@ -108,19 +132,13 @@ private:
 	std::vector<std::vector<T>> m_mat;
 
 	// Check that matrix has equal dimensions
-	void check_equal_dimensions(const XQSMatrix<T> &other) const;
+	void check_equal_dimensions(const XQSMatrix<T>& other) const;
 	// Check that matrix has dimensions that are suitable for product oeration
-	void check_suitable_for_product(const XQSMatrix<T> &other) const;
+	void check_suitable_for_product(const XQSMatrix<T>& other) const;
 	// Validate row index
 	void validate_row_index(std::size_t index) const;
 	// Validate column index
 	void validate_column_index(std::size_t index) const;
-
-	// Tokenize string and parse tokens as matrix cell values.
-	template <class Converter>
-	static std::vector<T> tokenizeAndParse(const std::string & str,
-		const Converter & converter, const std::string & delimiters = " ",
-		bool trimEmpty = false);
 
 	// Helper function for gaussian reduction.
 	// Used to find inverse matrix.
@@ -133,40 +151,36 @@ public:
 	XQSMatrix(const XQSMatrix& src);
 	XQSMatrix(XQSMatrix&& src);
 
-	// Destructor
-	virtual ~XQSMatrix() {}
-
-
 	// Create identity matrix with K on the diaginal
 	static XQSMatrix<T> identity(std::size_t n, const T& k = T(1));
 	
 	// Swap matrices
-	void swap(XQSMatrix & other) noexcept;
+	void swap(XQSMatrix& other) noexcept;
 
 	// Operator overloading, for "standard" mathematical matrix operations
-	XQSMatrix& operator=(const XQSMatrix<T> &rhs);
+	XQSMatrix& operator=(const XQSMatrix<T>& rhs);
 	XQSMatrix& operator=(XQSMatrix<T>&& rhs);
 	
 	// Matrix mathematical operations
-	XQSMatrix operator+(const XQSMatrix<T> &rhs) const;
-	XQSMatrix& operator+=(const XQSMatrix<T> &rhs);
-	XQSMatrix operator-(const XQSMatrix<T> &rhs) const;
-	XQSMatrix& operator-=(const XQSMatrix<T> &rhs);
-	XQSMatrix operator*(const XQSMatrix<T> &rhs) const;
-	XQSMatrix&operator*=(const XQSMatrix<T> &rhs);
+	XQSMatrix operator+(const XQSMatrix<T>& rhs) const;
+	XQSMatrix& operator+=(const XQSMatrix<T>& rhs);
+	XQSMatrix operator-(const XQSMatrix<T>& rhs) const;
+	XQSMatrix& operator-=(const XQSMatrix<T>& rhs);
+	XQSMatrix operator*(const XQSMatrix<T>& rhs) const;
+	XQSMatrix&operator*=(const XQSMatrix<T>& rhs);
 	XQSMatrix transpose() const;
 	XQSMatrix inverse_v1() const;
 	XQSMatrix inverse_v2() const;
 
 	// Matrix/scalar operations
-	XQSMatrix operator+(const T & rhs) const;
-	XQSMatrix operator-(const T & rhs) const;
-	XQSMatrix operator*(const T & rhs) const;
-	XQSMatrix operator/(const T & rhs) const;
-	XQSMatrix& operator+=(const T & rhs);
-	XQSMatrix& operator-=(const T & rhs);
-	XQSMatrix& operator*=(const T & rhs);
-	XQSMatrix& operator/=(const T & rhs);
+	XQSMatrix operator+(const T& rhs) const;
+	XQSMatrix operator-(const T& rhs) const;
+	XQSMatrix operator*(const T& rhs) const;
+	XQSMatrix operator/(const T& rhs) const;
+	XQSMatrix& operator+=(const T& rhs);
+	XQSMatrix& operator-=(const T& rhs);
+	XQSMatrix& operator*=(const T& rhs);
+	XQSMatrix& operator/=(const T& rhs);
 
 	// Matrix/vector operations
 	std::vector<T> diag_vec() const;
@@ -207,22 +221,22 @@ public:
 	}
 
 	// Access the individual elements
-	T & operator()(std::size_t row, std::size_t col) noexcept
+	T& operator()(std::size_t row, std::size_t col) noexcept
 	{
 		return m_mat[row][col];
 	}
 
-	const T & operator() (std::size_t row, std::size_t col) const noexcept
+	const T& operator() (std::size_t row, std::size_t col) const noexcept
 	{
 		return m_mat[row][col];
 	}
 
-	T & at(std::size_t row, std::size_t col)
+	T& at(std::size_t row, std::size_t col)
 	{
 		return m_mat.at(row).at(col);
 	}
 
-	const T & at(std::size_t row, std::size_t col) const
+	const T& at(std::size_t row, std::size_t col) const
 	{
 		return m_mat.at(row).at(col);
 	}
@@ -253,16 +267,62 @@ public:
 	XQSMatrix<T> column(std::size_t index) const;
 	// Extract matrix column as vector
 	std::vector<T> column_as_vector(std::size_t index) const;
-	
-	// Create from CSV file
-	template <class Converter>
-	static XQSMatrix readCsv(const std::string & path, char lineEnding,
-		const std::string & fieldDelimiters, const Converter & converter,
-		std::size_t numberOfHeaderLines);
 
 	const std::vector<std::vector<T>>& inner_vector() const noexcept
 	{
 		return m_mat;
+	}
+
+	// Read from CSV file
+	template <typename T, typename Converter>
+	friend XQSMatrix<T> readCsv(const std::string& path, char lineEnding,
+		const std::string& fieldDelimiters, const Converter& converter,
+		std::size_t numberOfHeaderLines)
+	{
+		XQSMatrix result(0, 0);
+
+		// Open input file
+		std::ifstream in(path.c_str());
+		if (!in.is_open()) {
+			throw std::runtime_error("Can't open input file");
+		}
+
+		// Skip header lines
+		std::string line;
+		size_t i = numberOfHeaderLines;
+		while (i > 0& & std::getline(in, line, lineEnding)) {
+			--i;
+		}
+		if (i > 0) {
+			throw std::runtime_error("Missing some header m_nrows");
+		}
+
+		// Parse data lines
+		size_t numberOfDataLines = 0;
+		while (std::getline(in, line, lineEnding)) {
+			++numberOfDataLines;
+			auto row = tokenizeAndParse(line, converter, fieldDelimiters);
+			if (row.empty()) {
+				throw std::
+					runtime_error("There is empty data line");
+			}
+			if (result.m_ncols != row.size()) {
+				if (result.m_ncols < row.size()) {
+					result.set_col_count(row.size());
+				} else {
+					row.resize(result.m_ncols);
+				}
+			}
+			result.m_mat.push_back(std::move(row));
+			++result.m_nrows;
+		}
+
+		// Ensure that at least one row have been successfully read
+		if (numberOfDataLines == 0) {
+			throw std::runtime_error("There is no data");
+		}
+
+		return result;
 	}
 };
 
@@ -279,7 +339,7 @@ XQSMatrix<T>::XQSMatrix(std::size_t nrows, std::size_t ncols) :
 }
 
 template <typename T>
-XQSMatrix<T>::XQSMatrix(std::size_t nrows, std::size_t ncols, const T & v) :
+XQSMatrix<T>::XQSMatrix(std::size_t nrows, std::size_t ncols, const T& v) :
 	m_nrows(nrows),
 	m_ncols(ncols),
 	m_mat(m_nrows)
@@ -318,7 +378,7 @@ XQSMatrix<T> XQSMatrix<T>::identity(std::size_t n, const T& k)
 
 // Swap matrices
 template <typename T>
-void XQSMatrix<T>::swap(XQSMatrix<T> &other) noexcept
+void XQSMatrix<T>::swap(XQSMatrix<T>& other) noexcept
 {
 	std::swap(m_nrows, other.m_nrows);
 	std::swap(m_ncols, other.m_ncols);
@@ -326,14 +386,14 @@ void XQSMatrix<T>::swap(XQSMatrix<T> &other) noexcept
 }
 
 template <typename T>
-inline void swap(XQSMatrix<T> &a, XQSMatrix<T> &b) noexcept
+inline void swap(XQSMatrix<T>& a, XQSMatrix<T>& b) noexcept
 {
 	a.swap(b);
 }
 
 // Assignment Operator
 template <typename T>
-XQSMatrix<T> &XQSMatrix<T>::operator=(const XQSMatrix<T> &rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator=(const XQSMatrix<T>& rhs)
 {
 	if (&rhs == this) {
 		m_mat = rhs.m_mat;
@@ -379,7 +439,7 @@ XQSMatrix<T> XQSMatrix<T>::operator+(const XQSMatrix<T>&rhs) const
 
 // Cumulative addition of this matrix and another
 template <typename T>
-XQSMatrix<T> &XQSMatrix<T>::operator+=(const XQSMatrix<T> &rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator+=(const XQSMatrix<T>& rhs)
 {
 	check_equal_dimensions(rhs);
 	for (std::size_t i = 0; i < m_nrows; i++) {
@@ -394,7 +454,7 @@ XQSMatrix<T> &XQSMatrix<T>::operator+=(const XQSMatrix<T> &rhs)
 
 // Subtraction of this matrix and another
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator-(const XQSMatrix<T> &rhs)const
+XQSMatrix<T> XQSMatrix<T>::operator-(const XQSMatrix<T>& rhs)const
 {
 	check_equal_dimensions(rhs);
 	XQSMatrix result(m_nrows, m_ncols);
@@ -411,7 +471,7 @@ XQSMatrix<T> XQSMatrix<T>::operator-(const XQSMatrix<T> &rhs)const
 
 // Cumulative subtraction of this matrix and another
 template <typename T>
-XQSMatrix<T> &XQSMatrix<T>::operator-=(const XQSMatrix<T> &rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator-=(const XQSMatrix<T>& rhs)
 {
 	check_equal_dimensions(rhs);
 	for (std::size_t i = 0; i < m_nrows; i++) {
@@ -445,7 +505,7 @@ XQSMatrix<T> XQSMatrix<T>::operator*(const XQSMatrix<T>& rhs) const
 
 // Cumulative left multiplication of this matrix and another
 template <typename T>
-XQSMatrix<T> &XQSMatrix<T>::operator*=(const XQSMatrix<T> &rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator*=(const XQSMatrix<T>& rhs)
 {
 	XQSMatrix result = (*this) * rhs;
 	swap(result);
@@ -653,7 +713,7 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 
 // Matrix/scalar addition
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator+(const T & rhs) const
+XQSMatrix<T> XQSMatrix<T>::operator+(const T& rhs) const
 {
 	XQSMatrix result(m_nrows, m_ncols);
 	for (std::size_t i = 0; i < m_nrows; i++) {
@@ -666,7 +726,7 @@ XQSMatrix<T> XQSMatrix<T>::operator+(const T & rhs) const
 }
 
 template <typename T>
-XQSMatrix<T>& XQSMatrix<T>::operator+=(const T & rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator+=(const T& rhs)
 {
 	for (std::size_t i = 0; i < m_nrows; i++) {
 		auto& row = m_mat[i];
@@ -679,7 +739,7 @@ XQSMatrix<T>& XQSMatrix<T>::operator+=(const T & rhs)
 
 // Matrix/scalar subtraction
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator-(const T & rhs) const
+XQSMatrix<T> XQSMatrix<T>::operator-(const T& rhs) const
 {
 	XQSMatrix result(m_nrows, m_ncols);
 	for (std::size_t i = 0; i < m_nrows; i++) {
@@ -693,7 +753,7 @@ XQSMatrix<T> XQSMatrix<T>::operator-(const T & rhs) const
 }
 
 template <typename T>
-XQSMatrix<T>& XQSMatrix<T>::operator-=(const T & rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator-=(const T& rhs)
 {
 	for (std::size_t i = 0; i < m_nrows; i++) {
 		auto& row = m_mat[i];
@@ -706,7 +766,7 @@ XQSMatrix<T>& XQSMatrix<T>::operator-=(const T & rhs)
 
 // Matrix/scalar multiplication
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator*(const T & rhs) const
+XQSMatrix<T> XQSMatrix<T>::operator*(const T& rhs) const
 {
 	XQSMatrix result(m_nrows, m_ncols);
 	for (std::size_t i = 0; i < m_nrows; i++) {
@@ -720,7 +780,7 @@ XQSMatrix<T> XQSMatrix<T>::operator*(const T & rhs) const
 }
 
 template <typename T>
-XQSMatrix<T>& XQSMatrix<T>::operator*=(const T & rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator*=(const T& rhs)
 {
 	for (std::size_t i = 0; i < m_nrows; i++) {
 		auto& row = m_mat[i];
@@ -733,7 +793,7 @@ XQSMatrix<T>& XQSMatrix<T>::operator*=(const T & rhs)
 
 // Matrix/scalar division
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator/(const T & rhs) const
+XQSMatrix<T> XQSMatrix<T>::operator/(const T& rhs) const
 {
 	XQSMatrix result(m_nrows, m_ncols);
 	for (std::size_t i = 0; i < m_nrows; i++) {
@@ -747,7 +807,7 @@ XQSMatrix<T> XQSMatrix<T>::operator/(const T & rhs) const
 }
 
 template <typename T>
-XQSMatrix<T>& XQSMatrix<T>::operator/=(const T & rhs)
+XQSMatrix<T>& XQSMatrix<T>::operator/=(const T& rhs)
 {
 	for (std::size_t i = 0; i < m_nrows; i++) {
 		auto& row = m_mat[i];
@@ -968,88 +1028,11 @@ XQSMatrix<T> XQSMatrix<T>::window(std::size_t row, std::size_t col,
 	return result;
 }
 
-// Read from CSV file
-template <typename T>
-template < class Converter >
-XQSMatrix<T> XQSMatrix<T>::readCsv(const std::string & path, char lineEnding,
-	const std::string & fieldDelimiters, const Converter & converter,
-	std::size_t numberOfHeaderLines)
-{
-	XQSMatrix result(0, 0);
-
-	// Open input file
-	std::ifstream in(path.c_str());
-	if (!in.is_open()) {
-		throw std::runtime_error("Can't open input file");
-	}
-
-	// Skip header lines
-	std::string line;
-	size_t i = numberOfHeaderLines;
-	while (i > 0 && std::getline(in, line, lineEnding)) {
-		--i;
-	}
-	if (i > 0) {
-		throw std::runtime_error("Missing some header m_nrows");
-	}
-
-	// Parse data lines
-	size_t numberOfDataLines = 0;
-	while (std::getline(in, line, lineEnding)) {
-		++numberOfDataLines;
-		auto row = tokenizeAndParse(line, converter, fieldDelimiters);
-		if (row.empty()) {
-			throw std::
-				runtime_error("There is empty data line");
-		}
-		if (result.m_ncols != row.size()) {
-			if (result.m_ncols < row.size()) {
-				result.set_col_count(row.size());
-			} else {
-				row.resize(result.m_ncols);
-			}
-		}
-		result.m_mat.push_back(std::move(row));
-		++result.m_nrows;
-	}
-
-	// Ensure that at least one row have been successfully read
-	if (numberOfDataLines == 0) {
-		throw std::runtime_error("There is no data");
-	}
-
-	return result;
-}
-
-// Tokenize string and parse tokens as matrix cell values.
-// This code is based on the public domain code taken from here:
-// https://stackoverflow.com/a/1493195/1540501
-template <typename T>
-template <class Converter>
-std::vector<T> XQSMatrix<T>::tokenizeAndParse(const std::string& str,
-	const Converter& converter, const std::string & delimiters, bool trimEmpty)
-{
-	std::vector<T> result;
-	std::string::size_type pos, lastPos = 0, length = str.length();
-	while (lastPos < length + 1) {
-		pos = str.find_first_of(delimiters, lastPos);
-		if (pos == std::string::npos) {
-			pos = length;
-		}
-		if (pos != lastPos || !trimEmpty) {
-			result.push_back(converter(str.substr(lastPos, pos - lastPos)));
-		}
-		lastPos = pos + 1;
-	}
-	return result;
-}
-
-
 // Check that matrix has equal dimensions
 template <typename T>
-void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T> &other) const
+void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T>& other) const
 {
-	if (m_nrows != other.m_nrows && m_ncols != other.m_ncols) {
+	if (m_nrows != other.m_nrows& & m_ncols != other.m_ncols) {
 		std::ostringstream err;
 		err << "Dimensions of the other matrix differ "
 				"(this vs other (rows*cols): "
@@ -1060,7 +1043,7 @@ void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T> &other) const
 }
 
 template <typename T>
-void XQSMatrix<T>::check_suitable_for_product(const XQSMatrix<T> &other) const
+void XQSMatrix<T>::check_suitable_for_product(const XQSMatrix<T>& other) const
 {
 	if (m_ncols != other.m_nrows) {
 		std::ostringstream err;
