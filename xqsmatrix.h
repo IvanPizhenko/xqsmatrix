@@ -41,7 +41,7 @@
 // - added new method inverse() to compute of inverse matrix
 // - added new static method readCsv() to construct matrix from data in the
 //   CSV file
-// - added new methods set_row_count() and set_col_count() to resize matrix
+// - added new methods row_count() and col_count() to resize matrix
 // - added method window() to create new matrix from rectangular window
 //   in the current matrix
 // - added new method swap() and used it in some other methods to optimize
@@ -126,24 +126,6 @@ std::vector<T> tokenizeAndParse(const std::string& str,
 
 template <typename T>
 class XQSMatrix {
-private:
-	std::size_t m_nrows;
-	std::size_t m_ncols;
-	std::vector<std::vector<T>> m_mat;
-
-	// Check that matrix has equal dimensions
-	void check_equal_dimensions(const XQSMatrix<T>& other) const;
-	// Check that matrix has dimensions that are suitable for product oeration
-	void check_suitable_for_product(const XQSMatrix<T>& other) const;
-	// Validate row index
-	void validate_row_index(std::size_t index) const;
-	// Validate column index
-	void validate_column_index(std::size_t index) const;
-
-	// Helper function for gaussian reduction.
-	// Used to find inverse matrix.
-	std::vector<size_t> gaussian_reduction();
-
 public:
 	// Constructors
 	explicit XQSMatrix(std::size_t nrows = 1, std::size_t ncols = 1);
@@ -162,21 +144,26 @@ public:
 	XQSMatrix& operator=(XQSMatrix<T>&& rhs);
 	
 	// Matrix mathematical operations
-	XQSMatrix operator+(const XQSMatrix<T>& rhs) const;
+
+	friend XQSMatrix operator+(const XQSMatrix<T>& lhs, const XQSMatrix<T>& rhs);
+	friend XQSMatrix operator-(const XQSMatrix<T>& lhs, const XQSMatrix<T>& rhs);
+	friend XQSMatrix operator*(const XQSMatrix<T>& lhs, const XQSMatrix<T>& rhs);
+
 	XQSMatrix& operator+=(const XQSMatrix<T>& rhs);
-	XQSMatrix operator-(const XQSMatrix<T>& rhs) const;
 	XQSMatrix& operator-=(const XQSMatrix<T>& rhs);
-	XQSMatrix operator*(const XQSMatrix<T>& rhs) const;
 	XQSMatrix&operator*=(const XQSMatrix<T>& rhs);
-	XQSMatrix transpose() const;
-	XQSMatrix inverse_v1() const;
-	XQSMatrix inverse_v2() const;
+
+	friend XQSMatrix transpose(const XQSMatrix<T>& m);
+	friend XQSMatrix inverse_v1(const XQSMatrix<T>& m);
+	friend XQSMatrix inverse_v2(const XQSMatrix<T>& m);
 
 	// Matrix/scalar operations
-	XQSMatrix operator+(const T& rhs) const;
-	XQSMatrix operator-(const T& rhs) const;
-	XQSMatrix operator*(const T& rhs) const;
-	XQSMatrix operator/(const T& rhs) const;
+
+	friend XQSMatrix operator+(const XQSMatrix<T>& lhs, const T& rhs);
+	friend XQSMatrix operator-(const XQSMatrix<T>& lhs, const T& rhs);
+	friend XQSMatrix operator*(const XQSMatrix<T>& lhs, const T& rhs);
+	friend XQSMatrix operator/(const XQSMatrix<T>& lhs, const T& rhs);
+
 	XQSMatrix& operator+=(const T& rhs);
 	XQSMatrix& operator-=(const T& rhs);
 	XQSMatrix& operator*=(const T& rhs);
@@ -184,61 +171,66 @@ public:
 
 	// Matrix/vector operations
 	std::vector<T> diag_vec() const;
+
 	// Multiple by vector as row
 	XQSMatrix mul_by_row(const std::vector<T>& row_data) const;
+
 	// Multiple by vector as column
 	std::vector<T> mul_by_column(const std::vector<T>& column_data) const;
+
 	// Scalar product of the row with a given vector
 	T row_scalar_product(std::size_t row_index, const std::vector<T>& v) const;
+
 	// Scalar product of the column with a given vector
 	T column_scalar_product(
 		std::size_t col_index, const std::vector<T>& v) const;
 	
 	// Add "count" columns at postion "pos" with inital value "v"
 	void add_columns(std::size_t pos, std::size_t count, const T& v);
+
 	// Remove "count" columns at postion "pos"
 	void remove_columns(std::size_t pos, std::size_t count);
 
 	// Access the rows
 	std::vector<T>& operator[](std::size_t i) noexcept
 	{
-		return m_mat[i];
+		return m_data[i];
 	}
 
 	const std::vector<T>& operator[](std::size_t i) const noexcept
 	{
-		return m_mat[i];
+		return m_data[i];
 	}
 
 	std::vector<T>& at(std::size_t i)
 	{
-		return m_mat.at(i);
+		return m_data.at(i);
 	}
 
 	const std::vector<T>& at(std::size_t i) const
 	{
-		return m_mat.at(i);
+		return m_data.at(i);
 	}
 
 	// Access the individual elements
 	T& operator()(std::size_t row, std::size_t col) noexcept
 	{
-		return m_mat[row][col];
+		return m_data[row][col];
 	}
 
 	const T& operator() (std::size_t row, std::size_t col) const noexcept
 	{
-		return m_mat[row][col];
+		return m_data[row][col];
 	}
 
 	T& at(std::size_t row, std::size_t col)
 	{
-		return m_mat.at(row).at(col);
+		return m_data.at(row).at(col);
 	}
 
 	const T& at(std::size_t row, std::size_t col) const
 	{
-		return m_mat.at(row).at(col);
+		return m_data.at(row).at(col);
 	}
 
 	// Access the row and column sizes
@@ -253,24 +245,33 @@ public:
 	}
 
 	// Change row and colums sizes
-	void set_row_count(std::size_t new_rows);
-	void set_col_count(std::size_t new_cols);
+	void row_count(std::size_t new_rows);
+	void col_count(std::size_t new_cols);
 
 	// Extact rectangular window as new matrix
 	XQSMatrix window(std::size_t row, std::size_t col,
 		std::size_t nrows, std::size_t ncols) const;
+
 	// Extract matrix row as matrix
 	XQSMatrix<T> row(std::size_t index) const;
+
 	// Extract matrix row as vector
 	std::vector<T> row_as_vector(std::size_t index) const;
-	// Extract matrix column as matrix
-	XQSMatrix<T> column(std::size_t index) const;
-	// Extract matrix column as vector
-	std::vector<T> column_as_vector(std::size_t index) const;
 
-	const std::vector<std::vector<T>>& inner_vector() const noexcept
+	// Extract matrix column as matrix
+	XQSMatrix<T> col(std::size_t index) const;
+
+	// Extract matrix column as vector
+	std::vector<T> col_as_vector(std::size_t index) const;
+
+	std::vector<std::vector<T>>& data() noexcept
 	{
-		return m_mat;
+		return m_data;
+	}
+
+	const std::vector<std::vector<T>>& data() const noexcept
+	{
+		return m_data;
 	}
 
 	// Read from CSV file
@@ -308,12 +309,12 @@ public:
 			}
 			if (result.m_ncols != row.size()) {
 				if (result.m_ncols < row.size()) {
-					result.set_col_count(row.size());
+					result.col_count(row.size());
 				} else {
 					row.resize(result.m_ncols);
 				}
 			}
-			result.m_mat.push_back(std::move(row));
+			result.m_data.push_back(std::move(row));
 			++result.m_nrows;
 		}
 
@@ -324,17 +325,34 @@ public:
 
 		return result;
 	}
+
+private:
+	std::size_t m_nrows;
+	std::size_t m_ncols;
+	std::vector<std::vector<T>> m_data;
+
+	// Check that matrix has equal dimensions
+	void check_equal_dimensions(const XQSMatrix<T>& other) const;
+	// Check that matrix has dimensions that are suitable for product oeration
+	void check_suitable_for_product(const XQSMatrix<T>& other) const;
+	// Validate row index
+	void validate_row_index(std::size_t index) const;
+	// Validate column index
+	void validate_column_index(std::size_t index) const;
+
+	// Helper function for gaussian reduction.
+	// Used to find inverse matrix.
+	std::vector<size_t> gaussian_reduction();
 };
 
-// Parameter Constructor
 template <typename T>
 XQSMatrix<T>::XQSMatrix(std::size_t nrows, std::size_t ncols) :
 	m_nrows(nrows),
 	m_ncols(ncols),
-	m_mat(m_nrows)
+	m_data(m_nrows)
 {
-	for (std::size_t i = 0; i < nrows; i++) {
-		m_mat[i].resize(ncols);
+	for (std::size_t i = 0; i < nrows; ++i) {
+		m_data[i].resize(ncols);
 	}
 }
 
@@ -342,28 +360,26 @@ template <typename T>
 XQSMatrix<T>::XQSMatrix(std::size_t nrows, std::size_t ncols, const T& v) :
 	m_nrows(nrows),
 	m_ncols(ncols),
-	m_mat(m_nrows)
+	m_data(m_nrows)
 {
-	for (std::size_t i = 0; i < nrows; i++) {
-		m_mat[i].resize(ncols, v);
+	for (std::size_t i = 0; i < nrows; ++i) {
+		m_data[i].resize(ncols, v);
 	}
 }
 
-// Copy Constructor
 template <typename T>
 XQSMatrix<T>::XQSMatrix(const XQSMatrix<T>& src) :
 	m_nrows(src.m_nrows),
 	m_ncols(src.m_ncols),
-	m_mat(src.m_mat)
+	m_data(src.m_data)
 {
 }
 
-// Move Constructor
 template <typename T>
 XQSMatrix<T>::XQSMatrix(XQSMatrix<T>&& src) :
 	m_nrows(src.m_nrows),
 	m_ncols(src.m_ncols),
-	m_mat(std::move( src.m_mat))
+	m_data(std::move( src.m_data))
 {
 }
 
@@ -372,17 +388,16 @@ XQSMatrix<T> XQSMatrix<T>::identity(std::size_t n, const T& k)
 {
 	XQSMatrix result(n, n, 0);
 	for (std::size_t i = 0; i < n; ++i)
-		result.m_mat[i][i] = k;
+		result.m_data[i][i] = k;
 	return result;
 }
 
-// Swap matrices
 template <typename T>
 void XQSMatrix<T>::swap(XQSMatrix<T>& other) noexcept
 {
 	std::swap(m_nrows, other.m_nrows);
 	std::swap(m_ncols, other.m_ncols);
-	m_mat.swap(other.m_mat);
+	m_data.swap(other.m_data);
 }
 
 template <typename T>
@@ -391,27 +406,25 @@ inline void swap(XQSMatrix<T>& a, XQSMatrix<T>& b) noexcept
 	a.swap(b);
 }
 
-// Assignment Operator
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator=(const XQSMatrix<T>& rhs)
 {
-	if (&rhs == this) {
-		m_mat = rhs.m_mat;
+	if (&rhs != this) {
+		m_data = rhs.m_data;
 		m_nrows = rhs.m_nrows;
 		m_ncols = rhs.m_ncols;
 	}
 	return *this;
 }
 
-// Move Assignment Operator
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator=(XQSMatrix<T>&& rhs)
 {
 	if (&rhs != this) {
 		std::vector<std::vector<T>> tmp(1);
 		tmp[0].resize(1);
-		tmp.swap(rhs.m_mat);
-		m_mat.swap(tmp);
+		tmp.swap(rhs.m_data);
+		m_data.swap(tmp);
 		m_nrows = rhs.m_nrows;
 		m_ncols = rhs.m_ncols;
 		rhs.m_nrows = 1;
@@ -420,90 +433,68 @@ XQSMatrix<T>& XQSMatrix<T>::operator=(XQSMatrix<T>&& rhs)
 	return *this;
 }
 
-// Addition of two matrices
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator+(const XQSMatrix<T>&rhs) const
+XQSMatrix<T> operator+(const XQSMatrix<T>& lhs, const XQSMatrix<T>&rhs)
 {
-	check_equal_dimensions(rhs);
-	XQSMatrix result(m_nrows, m_ncols);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		const auto& orow = rhs.m_mat[i];
-		auto& rrow = result.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			rrow[j] = row[j] + orow[j];
-		}
-	}
+	XQSMatrix result(lhs);
+	result += rhs;
 	return result;
 }
 
-// Cumulative addition of this matrix and another
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator+=(const XQSMatrix<T>& rhs)
 {
 	check_equal_dimensions(rhs);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		const auto& orow = rhs.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		auto& row = m_data[i];
+		const auto& orow = rhs.m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			row[j] += orow[j];
 		}
 	}
 	return *this;
 }
 
-// Subtraction of this matrix and another
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator-(const XQSMatrix<T>& rhs)const
+XQSMatrix<T> operator-(const XQSMatrix<T>& lhs, const XQSMatrix<T>& rhs)
 {
-	check_equal_dimensions(rhs);
-	XQSMatrix result(m_nrows, m_ncols);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		const auto& orow = rhs.m_mat[i];
-		auto& rrow = result.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			rrow[j] = row[j] - orow[j];
-		}
-	}
+	XQSMatrix result(lhs);
+	result -= rhs;
 	return result;
 }
 
-// Cumulative subtraction of this matrix and another
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator-=(const XQSMatrix<T>& rhs)
 {
 	check_equal_dimensions(rhs);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		const auto& orow = rhs.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		auto& row = m_data[i];
+		const auto& orow = rhs.m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			row[j] -= orow[j];
 		}
 	}
 	return *this;
 }
 
-// Left multiplication of this matrix and another
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator*(const XQSMatrix<T>& rhs) const
+XQSMatrix<T> operator*(const XQSMatrix<T>& lhs, const XQSMatrix<T>& rhs)
 {
-	check_suitable_for_product(rhs);
+	lhs.check_suitable_for_product(rhs);
 	const auto ncols = rhs.col_count();
-	XQSMatrix result(m_nrows, ncols, 0.0);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		for (std::size_t j = 0; j < ncols; j++) {
-			auto& res = result.m_mat[i][j];
-			for (std::size_t k = 0; k < m_ncols; k++) {
-				res += row[k] * rhs.m_mat[k][j];
+	XQSMatrix result(lhs.m_nrows, ncols, 0.0);
+	for (std::size_t i = 0; i < lhs.m_nrows; ++i) {
+		const auto& row = lhs.m_data[i];
+		for (std::size_t j = 0; j < ncols; ++j) {
+			auto& res = result.m_data[i][j];
+			for (std::size_t k = 0; k < lhs.m_ncols; ++k) {
+				res += row[k] * rhs.m_data[k][j];
 			}
 		}
 	}
 	return result;
 }
 
-// Cumulative left multiplication of this matrix and another
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator*=(const XQSMatrix<T>& rhs)
 {
@@ -512,51 +503,49 @@ XQSMatrix<T>& XQSMatrix<T>::operator*=(const XQSMatrix<T>& rhs)
 	return *this;
 }
 
-// Calculate a transpose of this matrix
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::transpose() const
+XQSMatrix<T> transpose(const XQSMatrix<T>& m)
 {
-	XQSMatrix result(m_ncols, m_nrows);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			result.m_mat[j][i] = row[j];
+	XQSMatrix result(m.m_ncols, m.m_nrows);
+	for (std::size_t i = 0; i < m.m_nrows; ++i) {
+		const auto& row = m.m_data[i];
+		for (std::size_t j = 0; j < m.m_ncols; ++j) {
+			result.m_data[j][i] = row[j];
 		}
 	}
 	return result;
 }
 
 
-// Calculate an inverse of this matrix (version #1)
 // based on the ideas from 
 // http://www.sanfoundry.com/java-program-find-inverse-matrix/
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::inverse_v1() const
+XQSMatrix<T> inverse_v1(const XQSMatrix<T>& m)
 {
-	if (m_nrows != m_ncols) {
+	if (m.m_nrows != m.m_ncols) {
 		throw std::logic_error("Can't invert non-square matrix");
 	}
 
-	const std::size_t N = m_nrows;
-	XQSMatrix a(*this);
+	const std::size_t N = m.m_nrows;
+	XQSMatrix a(m);
 	auto index = a.gaussian_reduction();
 
 	// Update the matrix b[i][j] with the ratios stored
-	XQSMatrix b = identity(N);
+	XQSMatrix b = XQSMatrix<T>::identity(N);
 	for (std::size_t i = 0; i < N - 1; ++i) {
 		for (std::size_t j = i + 1; j < N; ++j) {
-			const auto& av = a.m_mat[index[j]][i];
+			const auto& av = a.m_data[index[j]][i];
 			for (std::size_t k = 0; k < N; ++k) {
-					b.m_mat[index[j]][k] -= av * b.m_mat[index[i]][k];
+					b.m_data[index[j]][k] -= av * b.m_data[index[i]][k];
 			}
 		}
 	}
 
 	// Perform backward substitutions
 	XQSMatrix x(N, N);
-	auto& xrow = x.m_mat[N-1];
-	auto& arow = a.m_mat[index[N-1]];
-	auto& brow = b.m_mat[index[N-1]];
+	auto& xrow = x.m_data[N-1];
+	auto& arow = a.m_data[index[N-1]];
+	auto& brow = b.m_data[index[N-1]];
 	const auto& aa = arow[N-1];
 	if (aa == 0) {
 		throw std::runtime_error("Matrix can't be inverted 3");
@@ -582,56 +571,56 @@ XQSMatrix<T> XQSMatrix<T>::inverse_v1() const
 
 // Calculate an inverse of this matrix (version #2)
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::inverse_v2() const
+XQSMatrix<T> inverse_v2(const XQSMatrix<T>& m)
 {
-	if (m_nrows != m_ncols) {
+	if (m.m_nrows != m.m_ncols) {
 		throw std::logic_error("Can't invert non-square matrix");
 	}
 
-	const std::size_t N = m_nrows;
-	XQSMatrix rm(*this);
+	const std::size_t N = m.m_nrows;
+	XQSMatrix rm(m);
 	XQSMatrix im = identity(N);
 	const T zero = 0;
 	T d;
 
-	for (std::size_t i = 0; i < N - 1; i++) {
-		auto& ri = rm.m_mat[i];
+	for (std::size_t i = 0; i < N - 1; ++i) {
+		auto& ri = rm.m_data[i];
 		d = ri[i];
 		if (d == zero) {
 			throw std::logic_error("Matrix can't be inverted 1");
 		}
-		auto& ii = im.m_mat[i];
-		for (std::size_t col = 0; col < N; col++) {
+		auto& ii = im.m_data[i];
+		for (std::size_t col = 0; col < N; ++col) {
 			ri[col] /= d;
 			ii[col] /= d;
 		}
-		for (std::size_t row = i + 1; row < N; row++) {
-			auto& rr = rm.m_mat[row];
-			auto& ir = im.m_mat[row];
+		for (std::size_t row = i + 1; row < N; ++row) {
+			auto& rr = rm.m_data[row];
+			auto& ir = im.m_data[row];
 			d = rr[i];
-			for (std::size_t col = 0; col < N; col++) {
+			for (std::size_t col = 0; col < N; ++col) {
 				rr[col] -= ri[col] * d;
 				ir[col] -= ii[col] * d;
 			}
 		}
 	}
 
-	for (std::size_t i = N - 1; i > 0; i--) {
-		auto& ri = rm.m_mat[i];
+	for (std::size_t i = N - 1; i > 0; --i) {
+		auto& ri = rm.m_data[i];
 		d = ri[i];
 		if (d == zero) {
 			throw std::logic_error("Matrix can't be inverted 2");
 		}
-		auto& ii = im.m_mat[i];
-		for (size_t col = 0; col < N; col++) {
+		auto& ii = im.m_data[i];
+		for (size_t col = 0; col < N; ++col) {
 			ri[col] /= d;
 			ii[col] /= d;
 		}
-		for (size_t row = 0; row < i; row++) {
-			auto& rr = rm.m_mat[row];
-			auto& ir = im.m_mat[row];
+		for (size_t row = 0; row < i; ++row) {
+			auto& rr = rm.m_data[row];
+			auto& ir = im.m_data[row];
 			d = rr[i];
-			for (size_t col = 0; col < N; col++) {
+			for (size_t col = 0; col < N; ++col) {
 				rr[col] -= ri[col] * d;
 				ir[col] -= ii[col] * d;
 			}
@@ -641,8 +630,6 @@ XQSMatrix<T> XQSMatrix<T>::inverse_v2() const
 	return im;
 }
 
-// Helper function for gaussian reduction
-// used to find inverse matrix.
 template <typename T>
 std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 {
@@ -657,7 +644,7 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 	// Find the rescaling factors, one from each row
 	for (std::size_t i = 0; i < N; ++i) 
 	{
-		const auto& row = m_mat[i];
+		const auto& row = m_data[i];
 		double c1 = 0;
 		for (std::size_t j = 0; j < N; ++j) 
 		{
@@ -674,7 +661,7 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 		T pi1 = 0;
 		for (std::size_t i = j; i < N; ++i) 
 		{
-			T pi0 = std::abs(m_mat[index[i]][j]);
+			T pi0 = std::abs(m_data[index[i]][j]);
 			if (c[index[i]] == 0) {
 				throw std::runtime_error("Matrix can't be inverted 5");
 			}
@@ -687,7 +674,7 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 
 		// Interchange rows according to the pivoting order
 		std::swap(index[k], index[j]);
-		auto& row0 = m_mat[index[j]];
+		auto& row0 = m_data[index[j]];
 		const auto& v = row0[j];
 		if (v == 0) {
 			throw std::runtime_error("Matrix can't be inverted 6");
@@ -695,7 +682,7 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 
 		for (std::size_t i = j + 1; i < N; ++i) 	
 		{
-			auto& row = m_mat[index[i]];
+			auto& row = m_data[index[i]];
 			auto& v2 = row[j];
 			auto pj = v2 / v;
 
@@ -711,125 +698,96 @@ std::vector<size_t> XQSMatrix<T>::gaussian_reduction()
 	return index;
 }
 
-// Matrix/scalar addition
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator+(const T& rhs) const
+XQSMatrix<T> operator+(const XQSMatrix<T>& lhs, const T& rhs)
 {
-	XQSMatrix result(m_nrows, m_ncols);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			result.m_mat[i][j] = row[j] + rhs;
-		}
-	}
+	XQSMatrix result(lhs);
+	result += rhs;
 	return result;
 }
 
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator+=(const T& rhs)
 {
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		auto& row = m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			row[j] += rhs;
 		}
 	}
 	return *this;
 }
 
-// Matrix/scalar subtraction
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator-(const T& rhs) const
+XQSMatrix<T> operator-(const XQSMatrix<T>& lhs, const T& rhs)
 {
-	XQSMatrix result(m_nrows, m_ncols);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		auto& rrow = result.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			rrow[j] = row[j] - rhs;
-		}
-	}
+	XQSMatrix result(lhs);
+	result -= rhs;
 	return result;
 }
 
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator-=(const T& rhs)
 {
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		auto& row = m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			row[j] -= rhs;
 		}
 	}
 	return *this;
 }
 
-// Matrix/scalar multiplication
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator*(const T& rhs) const
+XQSMatrix<T> operator*(const XQSMatrix<T>& lhs, const T& rhs)
 {
-	XQSMatrix result(m_nrows, m_ncols);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		auto& rrow = result.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			rrow[j] = row[j] * rhs;
-		}
-	}
+	XQSMatrix result(lhs);
+	result *= rhs;
 	return result;
 }
 
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator*=(const T& rhs)
 {
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		auto& row = m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			row[j] *= rhs;
 		}
 	}
 	return *this;
 }
 
-// Matrix/scalar division
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::operator/(const T& rhs) const
+XQSMatrix<T> operator/(const XQSMatrix<T>& lhs, const T& rhs)
 {
-	XQSMatrix result(m_nrows, m_ncols);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		auto& rrow = result.m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
-			rrow[j] = row[j] / rhs;
-		}
-	}
+	XQSMatrix result(lhs);
+	result /= rhs;
 	return result;
 }
 
 template <typename T>
 XQSMatrix<T>& XQSMatrix<T>::operator/=(const T& rhs)
 {
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		auto& row = m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			row[j] /= rhs;
 		}
 	}
 	return *this;
 }
 
-// Obtain a vector of the diagonal elements
 template <typename T>
 std::vector <T> XQSMatrix<T>::diag_vec() const
 {
 	std::vector < T > result(m_nrows);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		result[i] = m_mat[i][i];
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		result[i] = m_data[i][i];
 	}
 	return result;
 }
 
-// Multiply a matrix with a vector represeting single row
 template <typename T>
 XQSMatrix<T> XQSMatrix<T>::mul_by_row(const std::vector<T>& row_data) const
 {
@@ -845,16 +803,15 @@ XQSMatrix<T> XQSMatrix<T>::mul_by_row(const std::vector<T>& row_data) const
 	// Compute product
 	const auto ncols = row_data.size();
 	XQSMatrix<T> result(m_nrows, ncols, 0.0);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		for (std::size_t j = 0; j < ncols; j++) {
-			result.m_mat[i][j] = row[j] * row_data[j];
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		const auto& row = m_data[i];
+		for (std::size_t j = 0; j < ncols; ++j) {
+			result.m_data[i][j] = row[j] * row_data[j];
 		}
 	}
 	return result;
 }
 
-// Multiply a matrix with a vector representing single column
 template <typename T>
 std::vector<T> XQSMatrix<T>::mul_by_column(
 	const std::vector<T>& column_data) const
@@ -867,16 +824,15 @@ std::vector<T> XQSMatrix<T>::mul_by_column(
 
 	// Compute product
 	std::vector <T> result(m_nrows, 0.0);
-	for (std::size_t i = 0; i < m_nrows; i++) {
-		const auto& row = m_mat[i];
-		for (std::size_t j = 0; j < m_ncols; j++) {
+	for (std::size_t i = 0; i < m_nrows; ++i) {
+		const auto& row = m_data[i];
+		for (std::size_t j = 0; j < m_ncols; ++j) {
 			result[i] += row[j] * column_data[j];
 		}
 	}
 	return result;
 }
 
-// Scalar product of the row with a given vector
 template <typename T>
 T XQSMatrix<T>::row_scalar_product(
 	std::size_t row_index,
@@ -888,14 +844,13 @@ T XQSMatrix<T>::row_scalar_product(
 			"Input vector size mismatch for row scalar product");
 	}
 	T result = 0;
-	const auto& row = m_mat[row_index];
+	const auto& row = m_data[row_index];
 	for (std::size_t i = 0; i < m_ncols; ++i) {
 		result += row[i] * v[i];
 	}
 	return result;
 }
 
-// Scalar product of the column with a given vector
 template <typename T>
 T XQSMatrix<T>::column_scalar_product(
 	std::size_t col_index,
@@ -908,23 +863,21 @@ T XQSMatrix<T>::column_scalar_product(
 	}
 	T result = 0;
 	for (std::size_t i = 0; i < m_ncols; ++i) {
-		result += m_mat[i][col_index] * v[i];
+		result += m_data[i][col_index] * v[i];
 	}
 	return result;
 }
 
-// Add "count" columns at postion "pos" with inital value "v"
 template <typename T>
 void XQSMatrix<T>::add_columns(std::size_t pos, std::size_t count, const T& v)
 {
 	validate_column_index(pos);
-	for (auto& row: m_mat) {
+	for (auto& row: m_data) {
 		row.insert(row.begin() + pos, count, v);
 	}
 	m_ncols += count;
 }
 
-// Remove "count" columns at postion "pos"
 template <typename T>
 void XQSMatrix<T>::remove_columns(std::size_t pos, std::size_t count)
 {
@@ -936,7 +889,7 @@ void XQSMatrix<T>::remove_columns(std::size_t pos, std::size_t count)
 		throw std::logic_error(
 			"Can't remove column from matrix with single column");
 	}
-	for (auto& row: m_mat) {
+	for (auto& row: m_data) {
 		auto it = row.begin() + pos;
 		row.erase(it, it + count);
 	}
@@ -944,20 +897,23 @@ void XQSMatrix<T>::remove_columns(std::size_t pos, std::size_t count)
 }
 
 
-// Set the number of m_nrows in the matrix 
 template <typename T>
-void XQSMatrix<T>::set_row_count(std::size_t new_rows)
+void XQSMatrix<T>::row_count(std::size_t new_rows)
 {
-	m_mat.resize(new_rows);
+	m_data.resize(new_rows);
+	if (new_rows > m_nrows) {
+		for (std::size_t i = m_nrows; i < new_rows; ++i) {
+			m_data[i].resize(m_ncols);
+		}
+	}
 	m_nrows = new_rows;
 }
 
-// Get the number  of columns in the matrix
 template <typename T>
-void XQSMatrix<T>::set_col_count(std::size_t new_cols)
+void XQSMatrix<T>::col_count(std::size_t new_cols)
 {
-	for (std::size_t i = 0; i < m_mat.size(); ++i)
-		m_mat[i].resize(new_cols);
+	for (std::size_t i = 0; i < m_data.size(); ++i)
+		m_data[i].resize(new_cols);
 	m_ncols = new_cols;
 }
 
@@ -966,7 +922,7 @@ XQSMatrix<T> XQSMatrix<T>::row(std::size_t index) const
 {
 	validate_row_index(index);
 	XQSMatrix<T> result(1, m_ncols);
-	result.m_mat[0] = m_mat[index];
+	result.m_data[0] = m_data[index];
 	return result;
 }
 
@@ -974,33 +930,34 @@ template <typename T>
 std::vector<T> XQSMatrix<T>::row_as_vector(std::size_t index) const
 {
 	validate_row_index(index);
-	return m_mat[index];
+	return m_data[index];
 }
 
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::column(std::size_t index) const
+XQSMatrix<T> XQSMatrix<T>::col(std::size_t index) const
 {
 	validate_column_index(index);
 	XQSMatrix<T> result(m_nrows, 1);
 	for (std::size_t i = 0; i < m_nrows; ++i) {
-		result.m_mat[i][0] = m_mat[i][index];
+		result.m_data[i][0] = m_data[i][index];
 	}
 	return result;
 }
 
 template <typename T>
-std::vector<T> XQSMatrix<T>::column_as_vector(std::size_t index) const
+std::vector<T> XQSMatrix<T>::col_as_vector(std::size_t index) const
 {
 	validate_column_index(index);
 	std::vector<T> result(m_nrows);
 	for (std::size_t i = 0; i < m_nrows; ++i) {
-		result[i] = m_mat[i][index];
+		result[i] = m_data[i][index];
 	}
 	return result;
 }
 
 template <typename T>
-XQSMatrix<T> XQSMatrix<T>::window(std::size_t row, std::size_t col,
+XQSMatrix<T> XQSMatrix<T>::window(
+	std::size_t row, std::size_t col,
 	std::size_t nrows, std::size_t ncols) const
 {
 	// Validate input parameters
@@ -1020,9 +977,10 @@ XQSMatrix<T> XQSMatrix<T>::window(std::size_t row, std::size_t col,
 	// Build new matrix
 	XQSMatrix result(nrows, ncols);
 	for (std::size_t i = 0; i < nrows; ++i) {
-		auto& rrow = result.m_mat[i];
+		auto& rrow = result.m_data[i];
+		auto& r = m_data[row + i];
 		for (std::size_t j = 0; j < ncols; ++j) {
-			rrow[j] = m_mat[row + i][col + j];
+			rrow[j] = r[col + j];
 		}
 	}
 	return result;
@@ -1048,7 +1006,7 @@ void XQSMatrix<T>::check_suitable_for_product(const XQSMatrix<T>& other) const
 	if (m_ncols != other.m_nrows) {
 		std::ostringstream err;
 		err << "Dimensions of the other matrix are not suitable for the"
-			" product this*other (this vs other (rows*cols): "
+				" product this*other (this vs other (rows*cols): "
 			<< m_nrows << "*" << m_ncols << " vs " << other.m_nrows << "*"
 			<< other.m_ncols << ")"; 
 		throw std::invalid_argument(err.str());
@@ -1071,22 +1029,20 @@ void XQSMatrix<T>::validate_column_index(std::size_t index) const
 	}
 }
 
-template<class T, class CharT = char, class Traits = std::char_traits<CharT>>
+template<class T, class CharT = char, class Traits>
 std::basic_ostream<CharT, Traits>& operator<<(
 	std::basic_ostream<CharT, Traits>& os,
-	const XQSMatrix<T>& matrix)
+	const XQSMatrix<T>& m)
 {
 	typename std::basic_ostream<CharT, Traits>::sentry sentry(os);
-	const auto nrows = matrix.row_count();
-	const auto ncols = matrix.col_count(); 
-	const auto& v = matrix.inner_vector();
+	const auto nrows = m.row_count();
+	const auto ncols = m.col_count(); 
+	const auto& v = m.inner_vector();
 	for (std::size_t i = 0; i < nrows; ++i) {
 		const auto& row = v[i];
-		for (std::size_t j = 0; j < ncols; ++j) {
-			if (j > 0) {
-				os << '\t';
-			}
-			os << row[j];
+		os << row[0];
+		for (std::size_t j = 1; j < ncols; ++j) {
+			os << '\t' << row[j];
 		}
 		os << '\n';
 	}
