@@ -26,44 +26,45 @@
 // THE SOFTWARE.
 //
 // Changes from the original code presented in the article:
-// - renamed QSMatrix data members
-// - removed unnecesary "this->" before member access
-// - optimized constructors and assignment operators
-// - added move constructor and assignment operator
-// - using "std::size_t" instead of "unsigned" for the matrix dimensions
-// - modified meber operator() signature to eliminate passing primitive type 
+// - Renamed QSMatrix data members
+// - Removed unnecesary "this->" before member access
+// - Optimized constructors and assignment operators
+// - Added move constructor and assignment operator
+// - Using "std::size_t" instead of "unsigned" for the matrix dimensions
+// - Modified meber operator() signature to eliminate passing primitive type 
 //   by reference
-// - added new methods at() to enable access with checking dimension boundaries
-// - fixed error in the method transpose(), which worked incorrectly with
+// - Added new methods at() to enable access with checking dimension boundaries
+// - Fixed error in the method transpose(), which worked incorrectly with
 //   non-square matrices
-// - modified member operator*(const XQSMatrix&) to validate matrix dimensions.
-// - added new static method identity() for generation of identity matrix
+// - Modified member operator*(const XQSMatrix&) to validate matrix dimensions.
+// - Added new static method identity() for generation of identity matrix
 // - added new method inverse() to compute of inverse matrix
-// - added new static method readCsv() to construct matrix from data in the
+// - Added new static method readCsv() to construct matrix from data in the
 //   CSV file
-// - added new methods row_count() and col_count() to resize matrix
+// - Added new methods row_count() and col_count() to resize matrix
 // - added method window() to create new matrix from rectangular window
 //   in the current matrix
-// - added new method swap() and used it in some other methods to optimize
+// - Added new method swap() and used it in some other methods to optimize
 //   computation speed
-// - added new method add_columns() to inject new columns size_to matrix
-// - added new method remove_columns() to remove columns from matrix
-// - added new methods mul_by_row() to multiply this matrix by vector,
+// - Added new method add_columns() to inject new columns size_to matrix
+// - Added new method remove_columns() to remove columns from matrix
+// - Added new methods mul_by_row() to multiply this matrix by vector,
 //   which represents single row matrix 
-// - added new methods mul_by_column() to multiply this matrix by vector,
+// - Added new methods mul_by_column() to multiply this matrix by vector,
 //   which represents single column matrix 
-// - added new method row_scalar_product() to find scalar product of matix row
+// - Added new method row_scalar_product() to find scalar product of matix row
 //   with a given vector
-// - added new method column_scalar_product() to find scalar product of matix
-//   column
-//   with a given vector
-// - added new method row() to extract row as matrix
-// - added new method row_as_vector() to extract row as vector
-// - added new method column() to extract column as matrix
-// - added new method column_as_vector() to extract column as vector
-// - added stream output operator
-// - class renamed to XQSMatrix
-// - added operator[] and new versions of method at() to access individual rows
+// - Added new method column_scalar_product() to find scalar product of matix
+//   column with a given vector
+// - Added new method row() to extract row as matrix
+// - Added new method row_as_vector() to extract row as vector
+// - Added new method col() to extract column as matrix
+// - Added new method col_as_vector() to extract column as vector
+// - Added stream output operator
+// - Class renamed to XQSMatrix
+// - Added operator[] and new versions of method at() to access individual rows
+// - Added fix_to_zero() to quickly eliminate too small values
+// - Reworked operators
 //
 // Changes are maintained on the GitHub:
 // https://github.com/IvanPizhenko/xqsmatrix
