@@ -18,9 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "xqsmatrix.h"
+
 #include <iostream>
 #include <random>
-#include "xqsmatrix.h"
 
 int main()
 {
