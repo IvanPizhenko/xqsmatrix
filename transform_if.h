@@ -24,16 +24,17 @@
 namespace stdx {
 
 template< class InputIt, class OutputIt, class UnaryOperation, class UnaryPredicate>
-OutputIt transform_if(InputIt first, InputIt last, OutputIt d_first,
-                      UnaryOperation unary_op, UnaryPredicate pred)
+OutputIt transform_if(
+  InputIt first, InputIt last, OutputIt d_first,
+  UnaryOperation unary_op, UnaryPredicate pred)
 {
-    for (; first != last; ++first) {
-        if (pred(*first)) {
-            *d_first = unary_op(*first);
-            ++d_first; 
-        }
+  for (; first != last; ++first) {
+    if (pred(*first)) {
+      *d_first = unary_op(*first);
+      ++d_first; 
     }
-    return d_first;
+  }
+  return d_first;
 }
 
 } // namespace stdx
