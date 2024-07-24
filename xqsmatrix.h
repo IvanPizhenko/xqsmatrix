@@ -200,6 +200,9 @@ public:
   // Remove "count" columns at postion "pos"
   void remove_columns(std::size_t pos, std::size_t count);
 
+  // Fix elements to zero
+  void fix_to_zero(const T& threshold);
+
   // Access the rows
   std::vector<T>& operator[](std::size_t i) noexcept
   {
@@ -535,6 +538,7 @@ XQSMatrix<T1> inverse_v1(const XQSMatrix<T1>& m)
     throw std::logic_error("Can't invert non-square matrix");
   }
 
+  const T1 zero = 0;
   const std::size_t N = m.m_nrows;
   XQSMatrix<T1> a(m);
   auto index = a.gaussian_reduction();
@@ -556,7 +560,7 @@ XQSMatrix<T1> inverse_v1(const XQSMatrix<T1>& m)
   auto& arow = a.m_data[index[N-1]];
   auto& brow = b.m_data[index[N-1]];
   const auto& aa = arow[N-1];
-  if (aa == 0) {
+  if (aa == zero) {
     throw std::runtime_error("Matrix can't be inverted 3");
   }
   for (std::size_t i = 0; i < N; ++i) {
@@ -569,7 +573,7 @@ XQSMatrix<T1> inverse_v1(const XQSMatrix<T1>& m)
       xji = b[index[j]][i];
       for (std::size_t k = j + 1; k < N; ++k) 
         xji -= ajrow[k] * x[k][i];
-      if (ajrow[j] == 0) {
+      if (ajrow[j] == zero) {
         throw std::runtime_error("Matrix can't be inverted 4");
       }
       xji /= ajrow[j];
@@ -865,6 +869,18 @@ void XQSMatrix<T>::remove_columns(std::size_t pos, std::size_t count)
   m_ncols -= count;
 }
 
+template <typename T>
+void XQSMatrix<T>::fix_to_zero(const T& threshold)
+{
+  const T zero = 0;
+  for (auto& row: m_data) {
+    for (T* p = row.data(), *e = p + row.size(); p != e; ++p) {
+      if (std::fabs(*p) < threshold) {
+        *p = zero;
+      }
+    }
+  }
+}
 
 template <typename T>
 void XQSMatrix<T>::row_count(std::size_t new_rows)

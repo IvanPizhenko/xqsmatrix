@@ -33,13 +33,17 @@ int main()
     for (std::size_t j = 0; j < N; ++j) {
       m(i, j) = d(rng);
     }
-  } 
+  }
+
+  constexpr double t = 2e-14;
 
   const auto mm1 = inverse_v1(m);
-  const auto pr1 = m * mm1;
+  auto pr1 = m * mm1;
+  pr1.fix_to_zero(t);
 
   const auto mm2 = inverse_v2(m);
-  const auto pr2 = m * mm2;
+  auto pr2 = m * mm2;
+  pr2.fix_to_zero(t);
 
   std::cout << pr1 << std::endl << std::endl;
   std::cout << pr2 << std::endl << std::endl;
