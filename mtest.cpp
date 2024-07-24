@@ -40,13 +40,21 @@ int main()
   const auto mm1 = inverse_v1(m);
   auto pr1 = m * mm1;
   pr1.fix_to_zero(t);
+  std::cout << pr1 << std::endl << std::endl;
 
   const auto mm2 = inverse_v2(m);
   auto pr2 = m * mm2;
   pr2.fix_to_zero(t);
-
-  std::cout << pr1 << std::endl << std::endl;
   std::cout << pr2 << std::endl << std::endl;
+
+  const auto mm3 = m + m;
+  std::cout << mm3 << std::endl << std::endl;
+
+  const auto mm4 = m - m;
+  std::cout << mm4 << std::endl << std::endl;
+
+  const auto mm5 = m * m;
+  std::cout << mm5 << std::endl << std::endl;
 
   return 0;
 }
