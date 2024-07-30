@@ -179,21 +179,21 @@ public:
   XQSMatrix& operator*=(const T& rhs);
   XQSMatrix& operator/=(const T& rhs);
 
-  // Matrix/vector operations
-  std::vector<T> diag_vec() const;
-
   // Multiple by vector as row
-  XQSMatrix mul_by_row(const std::vector<T>& row_data) const;
+  template <class T1>
+  friend XQSMatrix<T1> mul_by_row(const XQSMatrix<T1>& lhs, const std::vector<T1>& rhs);
 
   // Multiple by vector as column
-  std::vector<T> mul_by_column(const std::vector<T>& column_data) const;
+  template <class T1>
+  friend std::vector<T1> mul_by_column(const XQSMatrix<T1>& lhs, const std::vector<T1>& rhs);
 
   // Scalar product of the row with a given vector
-  T row_scalar_product(std::size_t row_index, const std::vector<T>& v) const;
+  template <class T1>
+  friend T1 row_scalar_product(const XQSMatrix<T1>& lhs, std::size_t row_index, const std::vector<T>& rhs);
 
   // Scalar product of the column with a given vector
-  T column_scalar_product(
-    std::size_t col_index, const std::vector<T>& v) const;
+  template <class T1>
+  friend T1 column_scalar_product(const XQSMatrix<T1>& lhs, std::size_t col_index, const std::vector<T1>& rhs);
   
   // Add "count" columns at postion "pos" with inital value "v"
   void add_columns(std::size_t pos, std::size_t count, const T& v);
@@ -709,92 +709,77 @@ XQSMatrix<T>& XQSMatrix<T>::operator/=(const T& rhs)
   return *this;
 }
 
-template <typename T>
-std::vector <T> XQSMatrix<T>::diag_vec() const
-{
-  std::vector < T > result(m_nrows);
-  for (std::size_t i = 0; i < m_nrows; ++i) {
-    result[i] = m_data[i][i];
-  }
-  return result;
-}
-
-template <typename T>
-XQSMatrix<T> XQSMatrix<T>::mul_by_row(const std::vector<T>& row_data) const
+template <typename T1>
+XQSMatrix<T1> mul_by_row(const XQSMatrix<T1>& lhs, const std::vector<T1>& rhs)
 {
   // Validate parameters
-  if (row_data.empty()) {
+  if (rhs.empty()) {
     throw std::logic_error("Empty column data");
   }
-  if (m_ncols != 1) {
+  if (lhs.m_ncols != 1) {
     throw std::logic_error(
       "Matrix dimensions mismatch for product with vector row");
   }
 
   // Compute product
-  const auto ncols = row_data.size();
-  XQSMatrix<T> result(m_nrows, ncols, 0.0);
-  for (std::size_t i = 0; i < m_nrows; ++i) {
-    const auto& row = m_data[i];
+  const auto ncols = rhs.size();
+  XQSMatrix<T1> result(lhs.m_nrows, ncols, 0.0);
+  for (std::size_t i = 0; i < lhs.m_nrows; ++i) {
+    const auto& row = lhs.m_data[i];
     for (std::size_t j = 0; j < ncols; ++j) {
-      result.m_data[i][j] = row[j] * row_data[j];
+      result.m_data[i][j] = row[j] * rhs[j];
     }
   }
   return result;
 }
 
-template <typename T>
-std::vector<T> XQSMatrix<T>::mul_by_column(
-  const std::vector<T>& column_data) const
+template <typename T1>
+std::vector<T1> mul_by_column(const XQSMatrix<T1>& lhs, const std::vector<T1>& rhs)
 {
   // Validate parameters
-  if (m_ncols != column_data.size()) {
+  if (lhs.m_ncols != rhs.size()) {
     throw std::invalid_argument(
       "Input vector size mismatch for product with vector column");
   }
 
   // Compute product
-  std::vector <T> result(m_nrows, 0.0);
-  for (std::size_t i = 0; i < m_nrows; ++i) {
-    const auto& row = m_data[i];
-    for (std::size_t j = 0; j < m_ncols; ++j) {
-      result[i] += row[j] * column_data[j];
+  std::vector<T1> result(lhs.m_nrows, 0.0);
+  for (std::size_t i = 0; i < lhs.m_nrows; ++i) {
+    const auto& row = lhs.m_data[i];
+    for (std::size_t j = 0; j < lhs.m_ncols; ++j) {
+      result[i] += row[j] * rhs[j];
     }
   }
   return result;
 }
 
-template <typename T>
-T XQSMatrix<T>::row_scalar_product(
-  std::size_t row_index,
-  const std::vector<T>& v) const
+template <typename T1>
+T1 row_scalar_product(const XQSMatrix<T1>& lhs, std::size_t row_index, const std::vector<T1>& v)
 {
-  validate_row_index(row_index);
-  if (v.size() != m_ncols) {
+  lhs.validate_row_index(row_index);
+  if (v.size() != lhs.m_ncols) {
     throw std::invalid_argument(
       "Input vector size mismatch for row scalar product");
   }
-  T result = 0;
-  const auto& row = m_data[row_index];
-  for (std::size_t i = 0; i < m_ncols; ++i) {
+  T1 result = 0;
+  const auto& row = lhs.m_data[row_index];
+  for (std::size_t i = 0; i < lhs.m_ncols; ++i) {
     result += row[i] * v[i];
   }
   return result;
 }
 
-template <typename T>
-T XQSMatrix<T>::column_scalar_product(
-  std::size_t col_index,
-  const std::vector<T>& v) const
+template <typename T1>
+T1 column_scalar_product(const XQSMatrix<T1>& lhs, std::size_t col_index, const std::vector<T1>& v)
 {
-  validate_column_index(col_index);
-  if (v.size() != m_nrows) {
+  lhs.validate_column_index(col_index);
+  if (v.size() != lhs.m_nrows) {
     throw std::invalid_argument(
       "Input vector size mismatch for column scalar product");
   }
-  T result = 0;
-  for (std::size_t i = 0; i < m_ncols; ++i) {
-    result += m_data[i][col_index] * v[i];
+  T1 result = 0;
+  for (std::size_t i = 0; i < lhs.m_ncols; ++i) {
+    result += lhs.m_data[i][col_index] * v[i];
   }
   return result;
 }
