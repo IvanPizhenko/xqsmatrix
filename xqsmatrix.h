@@ -98,6 +98,9 @@ public:
   XQSMatrix&operator*=(const XQSMatrix<T>& rhs);
 
   template <class T1>
+  friend std::vector<T1> diag_vec(const XQSMatrix<T1>& m);
+
+  template <class T1>
   friend XQSMatrix<T1> transpose(const XQSMatrix<T1>& m);
 
   template <class T1>
@@ -409,6 +412,16 @@ XQSMatrix<T>& XQSMatrix<T>::operator*=(const XQSMatrix<T>& rhs)
   XQSMatrix result = (*this) * rhs;
   swap(result);
   return *this;
+}
+
+template <class T1>
+std::vector<T1> diag_vec(const XQSMatrix<T1>& m)
+{
+  std::vector<T1> result(m.m_nrows);
+  for (std::size_t i = 0; i < m.m_nrows; ++i) {
+    result[i] = m.m_data[i][i];
+  }
+  return result;
 }
 
 template <typename T1>
