@@ -859,7 +859,7 @@ void XQSMatrix<T>::check_equal_dimensions(const XQSMatrix<T>& other) const
   if (m_nrows != other.m_nrows && m_ncols != other.m_ncols) {
     std::ostringstream err;
     err << "Dimensions of the other matrix differ "
-        "(this vs other (rows*cols): "
+           "(this vs other (rows*cols): "
       << m_nrows << "*" << m_ncols << " vs " << other.m_nrows << "*" 
       << other.m_ncols << ")"; 
     throw std::invalid_argument(err.str());
@@ -872,7 +872,7 @@ void XQSMatrix<T>::check_suitable_for_product(const XQSMatrix<T>& other) const
   if (m_ncols != other.m_nrows) {
     std::ostringstream err;
     err << "Dimensions of the other matrix are not suitable for the"
-        " product this*other (this vs other (rows*cols): "
+           " product this*other (this vs other (rows*cols): "
       << m_nrows << "*" << m_ncols << " vs " << other.m_nrows << "*"
       << other.m_ncols << ")"; 
     throw std::invalid_argument(err.str());
@@ -947,8 +947,7 @@ XQSMatrix<T1> readCsv(const std::string& path, char lineEnding,
     ++numberOfDataLines;
     auto row = parseVector(line, converter, fieldDelimiters);
     if (row.empty()) {
-      throw std::
-        runtime_error("There is empty data line");
+      throw std::runtime_error("There is empty data line");
     }
     if (result.m_ncols != row.size()) {
       if (result.m_ncols < row.size()) {
