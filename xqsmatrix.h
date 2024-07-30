@@ -53,36 +53,15 @@
 #ifndef XQSMATRIX_H__
 #define XQSMATRIX_H__
 
+// CRT
 #include <cmath>
+
+// STL
 #include <fstream>
 #include <stdexcept>
 #include <string>
 #include <sstream>
 #include <vector>
-
-
-// Tokenize string and parse tokens as matrix cell values.
-// This code is based on the public domain code taken from here:
-// https://stackoverflow.com/a/1493195/1540501
-template <typename T, typename Converter>
-std::vector<T> tokenizeAndParse(const std::string& str,
-  const Converter& converter, const std::string& delimiters = " ",
-  bool trimEmpty = false)
-{
-  std::vector<T> result;
-  std::string::size_type pos, lastPos = 0, length = str.length();
-  while (lastPos < length + 1) {
-    pos = str.find_first_of(delimiters, lastPos);
-    if (pos == std::string::npos) {
-      pos = length;
-    }
-    if (pos != lastPos || !trimEmpty) {
-      result.push_back(converter(str.substr(lastPos, pos - lastPos)));
-    }
-    lastPos = pos + 1;
-  }
-  return result;
-}
 
 template <typename T>
 class XQSMatrix {
@@ -916,6 +895,29 @@ void XQSMatrix<T>::validate_column_index(std::size_t index) const
   }
 }
 
+// Tokenize string and parse tokens as matrix cell values.
+// This code is based on the public domain code taken from here:
+// https://stackoverflow.com/a/1493195/1540501
+template <typename T, typename Converter>
+std::vector<T> parseVector(const std::string& str,
+  const Converter& converter, const std::string& delimiters = " ",
+  bool trimEmpty = false)
+{
+  std::vector<T> result;
+  std::string::size_type pos, lastPos = 0, length = str.length();
+  while (lastPos < length + 1) {
+    pos = str.find_first_of(delimiters, lastPos);
+    if (pos == std::string::npos) {
+      pos = length;
+    }
+    if (pos != lastPos || !trimEmpty) {
+      result.push_back(converter(str.substr(lastPos, pos - lastPos)));
+    }
+    lastPos = pos + 1;
+  }
+  return result;
+}
+
 template <typename T1, typename Converter>
 XQSMatrix<T1> readCsv(const std::string& path, char lineEnding,
   const std::string& fieldDelimiters, const Converter& converter,
@@ -943,7 +945,7 @@ XQSMatrix<T1> readCsv(const std::string& path, char lineEnding,
   size_t numberOfDataLines = 0;
   while (std::getline(in, line, lineEnding)) {
     ++numberOfDataLines;
-    auto row = tokenizeAndParse(line, converter, fieldDelimiters);
+    auto row = parseVector(line, converter, fieldDelimiters);
     if (row.empty()) {
       throw std::
         runtime_error("There is empty data line");
