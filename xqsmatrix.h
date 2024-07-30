@@ -291,53 +291,7 @@ public:
   template <typename T1, typename Converter>
   friend XQSMatrix<T1> readCsv(const std::string& path, char lineEnding,
     const std::string& fieldDelimiters, const Converter& converter,
-    std::size_t numberOfHeaderLines)
-  {
-    XQSMatrix<T1> result(0, 0);
-
-    // Open input file
-    std::ifstream in(path.c_str());
-    if (!in.is_open()) {
-      throw std::runtime_error("Can't open input file");
-    }
-
-    // Skip header lines
-    std::string line;
-    size_t i = numberOfHeaderLines;
-    while (i > 0 && std::getline(in, line, lineEnding)) {
-      --i;
-    }
-    if (i > 0) {
-      throw std::runtime_error("Missing some header m_nrows");
-    }
-
-    // Parse data lines
-    size_t numberOfDataLines = 0;
-    while (std::getline(in, line, lineEnding)) {
-      ++numberOfDataLines;
-      auto row = tokenizeAndParse(line, converter, fieldDelimiters);
-      if (row.empty()) {
-        throw std::
-          runtime_error("There is empty data line");
-      }
-      if (result.m_ncols != row.size()) {
-        if (result.m_ncols < row.size()) {
-          result.col_count(row.size());
-        } else {
-          row.resize(result.m_ncols);
-        }
-      }
-      result.m_data.push_back(std::move(row));
-      ++result.m_nrows;
-    }
-
-    // Ensure that at least one row have been successfully read
-    if (numberOfDataLines == 0) {
-      throw std::runtime_error("There is no data");
-    }
-
-    return result;
-  }
+    std::size_t numberOfHeaderLines);
 
 private:
   std::size_t m_nrows;
@@ -346,10 +300,13 @@ private:
 
   // Check that matrix has equal dimensions
   void check_equal_dimensions(const XQSMatrix<T>& other) const;
+
   // Check that matrix has dimensions that are suitable for product oeration
   void check_suitable_for_product(const XQSMatrix<T>& other) const;
+
   // Validate row index
   void validate_row_index(std::size_t index) const;
+
   // Validate column index
   void validate_column_index(std::size_t index) const;
 
@@ -1013,6 +970,57 @@ void XQSMatrix<T>::validate_column_index(std::size_t index) const
   if (index >= m_ncols) {
     throw std::out_of_range("Column index is out of range");
   }
+}
+
+template <typename T1, typename Converter>
+XQSMatrix<T1> readCsv(const std::string& path, char lineEnding,
+  const std::string& fieldDelimiters, const Converter& converter,
+  std::size_t numberOfHeaderLines)
+{
+  XQSMatrix<T1> result(0, 0);
+
+  // Open input file
+  std::ifstream in(path.c_str());
+  if (!in.is_open()) {
+    throw std::runtime_error("Can't open input file");
+  }
+
+  // Skip header lines
+  std::string line;
+  size_t i = numberOfHeaderLines;
+  while (i > 0 && std::getline(in, line, lineEnding)) {
+    --i;
+  }
+  if (i > 0) {
+    throw std::runtime_error("Missing some header m_nrows");
+  }
+
+  // Parse data lines
+  size_t numberOfDataLines = 0;
+  while (std::getline(in, line, lineEnding)) {
+    ++numberOfDataLines;
+    auto row = tokenizeAndParse(line, converter, fieldDelimiters);
+    if (row.empty()) {
+      throw std::
+        runtime_error("There is empty data line");
+    }
+    if (result.m_ncols != row.size()) {
+      if (result.m_ncols < row.size()) {
+        result.col_count(row.size());
+      } else {
+        row.resize(result.m_ncols);
+      }
+    }
+    result.m_data.push_back(std::move(row));
+    ++result.m_nrows;
+  }
+
+  // Ensure that at least one row have been successfully read
+  if (numberOfDataLines == 0) {
+    throw std::runtime_error("There is no data");
+  }
+
+  return result;
 }
 
 template<class T, class CharT = char, class Traits>

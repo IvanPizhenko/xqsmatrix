@@ -7,7 +7,7 @@ DEP:=$(OBJ:.o=.d)
 
 CXX:=g++
 LD:=g++
-CXXFLAGS:=-std=gnu++11 -pedantic -Wall -Wextra -Werror -fmax-errors=5
+CXXFLAGS:=-std=gnu++11 -pedantic -Wall -Wextra -Werror -fmax-errors=5 -MMD -MP
 LDFLAGS:=
 LIBS:=-lm
 
