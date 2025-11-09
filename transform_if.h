@@ -1,4 +1,4 @@
-// Copyright © 2018, 2024 Ivan Pizhenko. All rights reserved.
+// Copyright © 2018, 2024, 2025 Ivan Pizhenko. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,18 @@ namespace stdx {
 
 template< class InputIt, class OutputIt, class UnaryOperation, class UnaryPredicate>
 OutputIt transform_if(
-  InputIt first, InputIt last, OutputIt d_first,
-  UnaryOperation unary_op, UnaryPredicate pred)
+  InputIt first,
+  InputIt last,
+  OutputIt d_first,
+  UnaryOperation unary_op,
+  UnaryPredicate pred)
 {
-  for (; first != last; ++first) {
+  while (first != last) {
     if (pred(*first)) {
       *d_first = unary_op(*first);
       ++d_first; 
     }
+    ++first;
   }
   return d_first;
 }
