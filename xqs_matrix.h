@@ -25,29 +25,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// Original QSMatrix License terms:
-//
-// Copyright (c) 2012-2017 Michael Halls-Moore
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-// OR OTHER DEALINGS IN THE SOFTWARE.
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -153,7 +130,7 @@
  *     - [x] gaussian_reduction()
  *
  * 15. Stream operations:
- *     - [ ] operator<<
+ *     - [x] operator<<
  *     - [ ] operator>>
  *
  * 16. Additional I/O operations:
@@ -2275,10 +2252,56 @@ private:
 
 // ***** end of class *****
 
-template <typename T>
-inline void swap(xqs_matrix<T>& a, xqs_matrix<T>& b) noexcept
+template <typename T, class Alloc>
+inline void swap(xqs_matrix<T, Alloc>& a, xqs_matrix<T, Alloc>& b) noexcept
 {
   a.swap(b);
+}
+
+template<class T, class Alloc, class Ch, class Traits>
+std::basic_ostream<Ch, Traits>& operator<<(
+  std::basic_ostream<Ch, Traits>& os,
+  const xqs_matrix<T, Alloc>& m)
+{
+  typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
+  const auto row_count = m.row_count();
+  const auto column_count = m.column_count();
+  os << row_count << Ch('\t') << column_count << Ch('\n'); 
+  auto p0 = m.data();
+  const auto p0e = p0 + row_count * m.stride();
+  for (; p0 != p0e; p0 += m_stride) {
+    auto p = p0;
+    os << *p;
+    const auto pe = p + column_count;
+    for (++p; p != pe; ++p) {
+      os << Ch('\t') << *p;
+    }
+    os << Ch('\n');
+  }
+  return os;
+}
+
+template<class T, class Alloc, class Ch, class Traits>
+std::basic_ostream<Ch, Traits>& operator>>(
+  std::basic_ostream<Ch, Traits>& os,
+  xqs_matrix<T, Alloc>& m)
+{
+  // TODO: recheck this code
+  typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
+  std::size_t row_count, column_count;
+  os >> row_count >> column_count;
+  m.resize(row_count, column_count);
+  auto p0 = m.data();
+  const auto p0e = p0 + row_count * m.stride();
+  for (; p0 != p0e; p0 += m_stride) {
+    auto p = p0;
+    os >> *p;
+    const auto pe = p + column_count;
+    for (++p; p != pe; ++p) {
+      os >> *p;
+    }
+  }
+  return os;
 }
 
 // Tokenize string and parse tokens as matrix cell values.
@@ -2358,26 +2381,6 @@ xqs_matrix<U> read_csv(
   }
 
   return result;
-}
-
-template<class T, class Alloc, class Ch, class Traits>
-std::basic_ostream<Ch, Traits>& operator<<(
-  std::basic_ostream<Ch, Traits>& os,
-  const xqs_matrix<T, Alloc>& m)
-{
-  typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
-  const auto row_count = m.row_count();
-  const auto column_count = m.column_count(); 
-  auto p = m.data();
-  for (size_type i = 0; i < row_count; ++i) {
-    os << *p;
-    ++p;
-    for (size_type j = 1; j < column_count; ++j, ++p) {
-      os << Ch('\t') << *p;
-    }
-    os << Ch('\n');
-  }
-  return os;
 }
 
 #endif // XQS_MATRIX_H__
