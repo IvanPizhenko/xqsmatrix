@@ -45,6 +45,10 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "xtr1common": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "xmemory": "cpp"
     }
 }

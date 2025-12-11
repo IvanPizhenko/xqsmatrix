@@ -29,7 +29,7 @@ int main()
   std::uniform_real_distribution<double> d(0, 1.0);
   
   constexpr std::size_t N = 10;
-  XQSMatrix<double> m(N, N);
+  xqs_matrix<double> m(N, N);
   for (std::size_t i = 0; i < N; ++i) {
     for (std::size_t j = 0; j < N; ++j) {
       m(i, j) = d(rng);
