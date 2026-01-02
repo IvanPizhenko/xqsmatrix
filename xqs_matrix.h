@@ -441,7 +441,7 @@ public:
   }
 
   xqs_matrix(
-      std::initialize_list<T> init,
+      std::initializer_list<T> init,
       const size_type row_count,
       const size_type column_count,
       const Alloc& allocator = Alloc()) :
@@ -486,7 +486,7 @@ private:
   struct transposed_identity_matrix_tag {};
 
   struct multiplication_by_scalar_tag {};
-  struct division_by_sclar_tag {};
+  struct division_by_scalar_tag {};
 
   struct addition_tag {};
   struct subtraction_tag {};
@@ -2058,30 +2058,6 @@ public:
     return result;
   }
 
-  // Read from CSV file
-  template <typename U, typename Converter>
-  friend xqs_matrix<U> read_csv(
-    const std::string& path,
-    char line_delim,
-    const std::sting_view& field_delims,
-    const Converter& conv,
-    size_type header_line_count);
-
-  static std::size_t validate_dimensions(
-      const size_type row_count,
-      const size_type column_count)
-  {
-    constexpr auto max_size = std::numeric_limits<size_type>::max() / 2;
-    if (column_count == 0 || row_count > max_size / column_count) [[likely]] {
-      return row_count * column_count;
-    }
-
-    std::ostringstream err;
-    err << "xqs_matrix: dimensions are too large ("
-        << row_count << '*' << column_count << ')';
-    throw std::overflow_error(err.str());
-  }
-
 private:
 
   // Check that matrices have equal dimensions
@@ -2140,6 +2116,16 @@ private:
     err << "xqs_matrix: column index " << col << " is out of range ("
         << m_column_count << ')';
     throw std::invalid_argument(err.str());
+  }
+
+  // Initial validation of dimensions
+  static size_type validate_dimensions(const size_type row_count, const size_type column_count)
+  {
+    if (row_count == 0 || column_count == 0) [[unlikely]] return 0;
+    if (column_count > max_size() / row_count) [[unlikely]] {
+      throw std::length_error("xqs_matrix: matrix size is too large");
+    }
+    return row_count * column_count;
   }
 
   void do_move_assign(xqs_matrix&& rhs) noexcept
