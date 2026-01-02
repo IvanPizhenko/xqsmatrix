@@ -550,9 +550,8 @@ private:
   {
     if (m_data == nullptr) [[unlikely]] return;
 
-    if (m_column_count > 1) [[likely]] {
-      T* p = m_data;
-      if constexpr (std::is_trivial_v<T>) {
+    if constexpr (std::is_trivial_v<T>) {
+      if (m_column_count > 1) [[likely]] {
         const T t{};
         for (size_type i = 0, n = m_row_count - 1; i < n; ++i) {
           *p = value;
@@ -561,36 +560,39 @@ private:
           p += m_column_count;
         }
         *p = value;
-      } else {
-        try {
-          for (size_type i = 0, n = m_row_count - 1; i < n; ++i) {
-            std::construct_at(p, value);
-            ++p;
-            for (const auto e = p + step; p != e; ++p) {
-              std::construct_at(p);
-            }
-          }
+        return;
+      }
+
+      *m_data = value;
+      return;
+    }
+
+    if (m_column_count > 1) [[likely]] {
+      try {
+        for (size_type i = 0, n = m_row_count - 1; i < n; ++i) {
           std::construct_at(p, value);
-        } catch (...) {
-          for (; p != m_data; --p) {
-            std::destroy_at(p);
+          ++p;
+          for (const auto e = p + step; p != e; ++p) {
+            std::construct_at(p);
           }
-          m_allocator.deallocate(m_data, m_capacity);
-          throw;
         }
-      }
-    } else {
-      // Special case for 1x1 matrix
-      if constexpr (std::is_trivial_v<T>) {
-        *m_data = value;
-      } else {
-        try {
-          std::construct_at(m_data, value);
-        } catch (...) {
-          m_allocator.deallocate(m_data, m_capacity);
-          throw;
+        std::construct_at(p, value);
+        return;
+      } catch (...) {
+        for (; p != m_data; --p) {
+          std::destroy_at(p);
         }
+        m_allocator.deallocate(m_data, m_capacity);
+        throw;
       }
+    }
+
+    try {
+      std::construct_at(m_data, value);
+      return;
+    } catch (...) {
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
