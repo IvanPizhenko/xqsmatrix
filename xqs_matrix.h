@@ -150,6 +150,7 @@
 // STL
 #include <algorithm>
 #include <fstream>
+#include <memory>
 #include <numeric>
 #include <stdexcept>
 #include <sstream>
