@@ -274,7 +274,7 @@ public:
   {
     if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
-      std::uninitialized_fill_n(m_data, m_capacity, v);
+      std::uninitialized_fill_n(m_data, m_capacity, T{});
     } else {
       pointer p = m_data;
       try {
