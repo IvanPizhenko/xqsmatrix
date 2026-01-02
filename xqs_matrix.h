@@ -2264,9 +2264,19 @@ std::basic_ostream<Ch, Traits>& operator<<(
   const xqs_matrix<T, Alloc>& m)
 {
   typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
+
   const auto row_count = m.row_count();
   const auto column_count = m.column_count();
-  os << row_count << Ch('\t') << column_count << Ch('\n'); 
+
+  os << row_count;
+  if (!os) [[unlikely]] return os;
+  os << Ch('\t');
+  if (!os) [[unlikely]] return os;
+  os << column_count;
+  if (!os) [[unlikely]] return os;
+  os << Ch('\n'); 
+  if (!os) [[unlikely]] return os;
+
   auto p0 = m.data();
   const auto p0e = p0 + row_count * m.stride();
   for (; p0 != p0e; p0 += m_stride) {
@@ -2283,6 +2293,7 @@ std::basic_ostream<Ch, Traits>& operator<<(
     os << Ch('\n');
     if (!os) [[unlikely]] return os;
   }
+
   return os;
 }
 
@@ -2292,9 +2303,14 @@ std::basic_istream<Ch, Traits>& operator>>(
   xqs_matrix<T, Alloc>& m)
 {
   typename std::basic_istream<Ch, Traits>::sentry sentry(is);
+
   std::size_t row_count, column_count;
-  is >> row_count >> ' ' >> column_count;
+  is >> row_count;
+  if (!is) [[unlikely]] return is;
+  is >> column_count;
+  if (!is) [[unlikely]] return is;
   m.resize(row_count, column_count);
+
   auto p0 = m.data();
   const auto p0e = p0 + row_count * m.stride();
   for (; p0 != p0e; p0 += m_stride) {
@@ -2305,6 +2321,7 @@ std::basic_istream<Ch, Traits>& operator>>(
       if (!is) [[unlikely]] return is;
     }
   }
+
   return is;
 }
 
