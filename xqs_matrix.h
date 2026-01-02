@@ -204,9 +204,9 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
-      std::memset(m_data, 0, m_capacity * sizeof(T));
+      std::uninitialized_fill_n(m_data, m_capacity, T{});
     } else {
       auto p = m_data;
       try {
@@ -1757,7 +1757,7 @@ public:
         try {
           // Initialize new memory
           if constexpr (std::is_trivial_v<T>) {
-            std::memset(new_data, 0, new_capacity * sizeof(T));
+            std::uninitialized_fill_n(new_data, new_capacity, T{});
           } else {
             const auto e = new_data + new_capacity;
             for (; p != e; ++p) {
