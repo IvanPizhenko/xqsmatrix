@@ -272,6 +272,7 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
+    // REVIEW IMPLEMENRATION!!!
     if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, T{});
@@ -310,6 +311,7 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
+    // REVIEW IMPLEMENRATION!!!
     if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
