@@ -2282,27 +2282,30 @@ std::basic_ostream<Ch, Traits>& operator<<(
 }
 
 template<class T, class Alloc, class Ch, class Traits>
-std::basic_ostream<Ch, Traits>& operator>>(
-  std::basic_ostream<Ch, Traits>& os,
+std::basic_istream<Ch, Traits>& operator>>(
+  std::basic_istream<Ch, Traits>& is,
   xqs_matrix<T, Alloc>& m)
 {
   // TODO: recheck this code
-  typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
+  typename std::basic_istream<Ch, Traits>::sentry sentry(is);
   std::size_t row_count, column_count;
-  os >> row_count >> column_count;
+  is >> row_count >> ' ' >> column_count;
   m.resize(row_count, column_count);
   auto p0 = m.data();
   const auto p0e = p0 + row_count * m.stride();
   for (; p0 != p0e; p0 += m_stride) {
     auto p = p0;
-    os >> *p;
     const auto pe = p + column_count;
-    for (++p; p != pe; ++p) {
-      os >> *p;
+    for (; p != pe; ++p) {
+      is >> *p;
+      if (!is) [[unlikely]] return is;
     }
   }
-  return os;
+  return is;
 }
+
+
+#if 0
 
 // Tokenize string and parse tokens as matrix cell values.
 // This code is based on the public domain code taken from here:
@@ -2328,8 +2331,6 @@ std::vector<T> parse_vector(
   }
   return result;
 }
-
-#if 0
 
 template <typename U, typename Converter>
 xqs_matrix<U> read_csv(
