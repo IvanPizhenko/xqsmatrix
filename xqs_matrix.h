@@ -237,7 +237,7 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
     } else {
@@ -272,7 +272,7 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
     } else {
@@ -310,7 +310,7 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
     } else {
@@ -345,7 +345,7 @@ public:
     m_stride(m_column_count),
     m_is_owner(src.m_is_owner)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_copy_n(m_data, m_capacity, src.m_data);
     } else {
@@ -376,7 +376,7 @@ public:
     m_stride(m_column_count),
     m_is_owner(src.m_is_owner)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_copy_n(m_data, m_capacity, src.m_data);
     } else {
@@ -453,7 +453,7 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
     } else {
@@ -514,7 +514,7 @@ private:
     m_stride(dimension),
     m_is_owner(true)
   {
-    if (m_dataptr == nullptr) [[unlikely]] return;
+    if (m_data == nullptr) [[unlikely]] return;
     if (m_column_count > 1) [[likely]] {
       T* p = m_data;
       if constexpr (std::is_trivial_v<T>) {
