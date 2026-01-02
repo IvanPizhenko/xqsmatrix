@@ -1148,7 +1148,7 @@ public:
 
   void swap(xqs_matrix& other) noexcept
   {
-    m_allocator.swap(other.m_allocator);
+    // m_allocator.swap(other.m_allocator);
     std::swap(m_capacity, other.m_capacity);
     std::swap(m_data, other.m_data);
     std::swap(m_row_count, other.m_row_count);
