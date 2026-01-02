@@ -205,22 +205,24 @@ public:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, T{});
-    } else {
-      auto p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        for (; p != e; ++p) {
-          std::construct_at(p);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    auto p = m_data;
+    try {
+      const auto e = m_data + m_capacity;
+      for (; p != e; ++p) {
+        std::construct_at(p);
       }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -238,22 +240,24 @@ public:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
-    } else {
-      auto p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        for (; p != e; ++p) {
-          std::construct_at(p, v);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    auto p = m_data;
+    try {
+      const auto e = m_data + m_capacity;
+      for (; p != e; ++p) {
+        std::construct_at(p, v);
       }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -273,8 +277,11 @@ public:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
+    auto p = m_data;
+    const auto e = m_data + m_capacity;
+
     if constexpr (std::is_trivial_v<T>) {
-      const auto e = m_data + m_capacity;
       for (; p != e && first != last; ++first, ++p) {
         *p = *first;
       }
@@ -284,23 +291,22 @@ public:
           *p = a;
         }
       }
-    } else {
-      pointer p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        for (; p != e && first != last; ++first, ++p) {
-          std::construct_at(p, *first);
-        }
-        for (; p != e; ++p) {
-          std::construct_at(p, *first);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    try {
+      for (; p != e && first != last; ++first, ++p) {
+        std::construct_at(p, *first);
       }
+      for (; p != e; ++p) {
+        std::construct_at(p, *first);
+      }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -320,8 +326,11 @@ public:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
+    auto p = m_data;
+    const auto e = m_data + m_capacity;
+
     if constexpr (std::is_trivial_v<T>) {
-      const auto e = m_data + m_capacity;
       auto first = std::begin(r);
       const auto last = std::end(r);
       for (; p != e && first != last; ++first, ++p) {
@@ -333,25 +342,24 @@ public:
           *p = a;
         }
       }
-    } else {
-      pointer p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        auto first = std::begin(r);
-        const auto last = std::end(r);
-        for (; p != e && first != last; ++first, ++p) {
-          std::construct_at(p, *first);
-        }
-        for (; p != e; ++p) {
-          std::construct_at(p, *first);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    try {
+      auto first = std::begin(r);
+      const auto last = std::end(r);
+      for (; p != e && first != last; ++first, ++p) {
+        std::construct_at(p, *first);
       }
+      for (; p != e; ++p) {
+        std::construct_at(p, *first);
+      }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -366,22 +374,24 @@ public:
     m_is_owner(src.m_is_owner)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_copy_n(m_data, m_capacity, src.m_data);
-    } else {
-      auto p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        for (auto q = src.m_data; p != e; ++q, ++p) {
-          std::construct_at(p, *q);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    auto p = m_data;
+    try {
+      const auto e = m_data + m_capacity;
+      for (auto q = src.m_data; p != e; ++q, ++p) {
+        std::construct_at(p, *q);
       }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -397,22 +407,24 @@ public:
     m_is_owner(src.m_is_owner)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_copy_n(m_data, m_capacity, src.m_data);
-    } else {
-      auto p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        for (auto q = src.m_data; p != e; ++p, ++q) {
-          std::construct_at(p, *q);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    auto p = m_data;
+    try {
+      const auto e = m_data + m_capacity;
+      for (auto q = src.m_data; p != e; ++p, ++q) {
+        std::construct_at(p, *q);
       }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -474,27 +486,29 @@ public:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
     if constexpr (std::is_trivial_v<T>) {
       std::uninitialized_fill_n(m_data, m_capacity, v);
-    } else {
-      auto p = m_data;
-      try {
-        const auto e = m_data + m_capacity;
-        auto first = init.begin();
-        const auto last = init.end();
-        for (; p != e && first != last; ++first, ++p) {
-          std::construct_at(p, *first);
-        }
-        for (; p != e; ++p) {
-          std::construct_at(p, *first);
-        }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      return;
+    }
+
+    auto p = m_data;
+    try {
+      const auto e = m_data + m_capacity;
+      auto first = init.begin();
+      const auto last = init.end();
+      for (; p != e && first != last; ++first, ++p) {
+        std::construct_at(p, *first);
       }
+      for (; p != e; ++p) {
+        std::construct_at(p, *first);
+      }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -535,6 +549,7 @@ private:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
     if (m_column_count > 1) [[likely]] {
       T* p = m_data;
       if constexpr (std::is_trivial_v<T>) {
