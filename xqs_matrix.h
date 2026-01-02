@@ -82,8 +82,8 @@
 //    - [x] at(pair<row, column>)
 //
 // 8. Assignment operators:
-//    - [x] Copy assignment)
-//    - [x] Move assignment)
+//    - [x] Copy assignment
+//    - [x] Move assignment
 //
 // 9. Swap method.
 //    - [x] swap() member function
