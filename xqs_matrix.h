@@ -272,10 +272,18 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    // REVIEW IMPLEMENRATION!!!
     if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
-      std::uninitialized_fill_n(m_data, m_capacity, T{});
+      const auto e = m_data + m_capacity;
+      for (; p != e && first != last; ++first, ++p) {
+        *p = *first;
+      }
+      if (p != e) {
+        const T a{}
+        for (; p != e; ++p) {
+          *p = a;
+        }
+      }
     } else {
       pointer p = m_data;
       try {
@@ -311,10 +319,20 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    // REVIEW IMPLEMENRATION!!!
     if (m_data == nullptr) [[unlikely]] return;
     if constexpr (std::is_trivial_v<T>) {
-      std::uninitialized_fill_n(m_data, m_capacity, v);
+      const auto e = m_data + m_capacity;
+      auto first = std::begin(r);
+      const auto last = std::end(r);
+      for (; p != e && first != last; ++first, ++p) {
+        *p = *first;
+      }
+      if (p != e) {
+        const T a{}
+        for (; p != e; ++p) {
+          *p = a;
+        }
+      }
     } else {
       pointer p = m_data;
       try {
