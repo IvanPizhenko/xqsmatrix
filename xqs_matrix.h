@@ -2271,12 +2271,17 @@ std::basic_ostream<Ch, Traits>& operator<<(
   const auto p0e = p0 + row_count * m.stride();
   for (; p0 != p0e; p0 += m_stride) {
     auto p = p0;
-    os << *p;
     const auto pe = p + column_count;
+    os << *p;
+    if (!os) [[unlikely]] return os;
     for (++p; p != pe; ++p) {
-      os << Ch('\t') << *p;
+      os << Ch('\t');
+      if (!os) [[unlikely]] return os;
+      os << *p;
+      if (!os) [[unlikely]] return os;
     }
     os << Ch('\n');
+    if (!os) [[unlikely]] return os;
   }
   return os;
 }
@@ -2286,7 +2291,6 @@ std::basic_istream<Ch, Traits>& operator>>(
   std::basic_istream<Ch, Traits>& is,
   xqs_matrix<T, Alloc>& m)
 {
-  // TODO: recheck this code
   typename std::basic_istream<Ch, Traits>::sentry sentry(is);
   std::size_t row_count, column_count;
   is >> row_count >> ' ' >> column_count;
