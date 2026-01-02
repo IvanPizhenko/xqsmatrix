@@ -2329,6 +2329,8 @@ std::vector<T> parse_vector(
   return result;
 }
 
+#if 0
+
 template <typename U, typename Converter>
 xqs_matrix<U> read_csv(
   const std::string& path,
@@ -2347,9 +2349,8 @@ xqs_matrix<U> read_csv(
 
   // Skip header lines
   auto i = header_line_count;
-  while (i > 0 &&
-         in.ignore(std::numeric_limits<std::streamsize>::max(), line_delim)) {
-    --i;
+  for (; i > 0; --i) {
+    if (!in.ignore(std::numeric_limits<std::streamsize>::max(), line_delim)) break;
   }
   if (i > 0) {
     throw std::runtime_error("read_csv: missing header lines");
@@ -2382,5 +2383,7 @@ xqs_matrix<U> read_csv(
 
   return result;
 }
+
+#endif
 
 #endif // XQS_MATRIX_H__
