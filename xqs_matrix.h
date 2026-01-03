@@ -1934,7 +1934,7 @@ public:
         for (auto p = m_data, e = m_data + size(); p != e; ++p) {
           std::destroy_at(p);
         }
-        m_stride = 0; /// TODO: check if this is needed
+        m_stride = 0; // TODO: check if this is needed
       }
     }
     m_row_count = 0;
