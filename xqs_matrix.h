@@ -1949,10 +1949,12 @@ public:
     }
 
     const size_type new_capacity = m_row_count * m_column_count;
+
     if (new_capacity < m_capacity) {
       auto new_data = new_capacity != 0
           ? m_allocator.allocate(new_capacity) 
           : nullptr;
+
       if (new_data != nullptr) {
         auto p = new_data;
         try {
