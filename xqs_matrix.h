@@ -627,6 +627,7 @@ private:
         return;
       }
 
+      *m_data = value;
       return;
     }
 
@@ -654,55 +655,11 @@ private:
       }
     }
 
-    if (m_column_count > 1) [[likely]] {
-      T* p = m_data;
-      auto n = m_column_count - 1;
-      if constexpr (std::is_trivial_v<T>) {
-        const T t{};
-        std::uninitialized_fill_n(p, n, t);
-        p += n;
-        --n;
-        for (size_type i = 0; i < m_row_count; ++i) {
-          *p = value;
-          ++p;
-          std::uninitialized_fill_n(p, n, t);
-          p += n;
-        }
-        *p = t;
-      } else {
-        try {
-          for (const auto e = p + n; p != e; ++p) {
-            std::construct_at(p);
-          }
-          --n;
-          for (size_type i = 0; i < m_row_count; ++i) {
-            std::construct_at(p);
-            ++p;
-            for (const auto e = p + n; p != e; ++p) {
-              std::construct_at(p);
-            }
-          }
-          std::construct_at(p);
-        } catch (...) {
-          for (; p != m_data; --p) {
-            std::destroy_at(p);
-          }
-          m_allocator.deallocate(m_data, m_capacity);
-          throw;
-        }
-      }
-    } else {
-      // Special case for 1x1 matrix
-      if constexpr (std::is_trivial_v<T>) {
-        *m_data = value;
-      } else {
-        try {
-          std::construct_at(m_data, value);
-        } catch (...) {
-          m_allocator.deallocate(m_data, m_capacity);
-          throw;
-        }
-      }
+    try {
+      std::construct_at(m_data, value);
+    } catch (...) {
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -1830,7 +1787,7 @@ public:
       throw std::logic_error("xqs_matrix: can't resize a non-owning matrix");
     }
 
-    const size_type new_capacity = validate_dimensions(new_rows, new_cols);
+    const auto new_capacity = validate_dimensions(new_rows, new_cols);
     if (new_capacity > m_capacity) {
       auto new_data = new_capacity != 0
           ? m_allocator.allocate(new_capacity) 
