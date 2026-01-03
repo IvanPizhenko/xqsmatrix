@@ -1929,16 +1929,16 @@ public:
 
   void clear() noexcept
   {
-    if (m_is_owner && m_data != nullptr) [[likely]] {
-      if constexpr (!std::is_trivial_v<T>) {
+    if constexpr (!std::is_trivial_v<T>) {
+      if (m_is_owner && m_data != nullptr) [[likely]] {
         for (auto p = m_data, e = m_data + size(); p != e; ++p) {
           std::destroy_at(p);
         }
+        m_stride = 0; /// TODO: check if this is needed
       }
     }
     m_row_count = 0;
     m_column_count = 0;
-    m_stride = 0;
   }
 
   void shrink_to_fit()
