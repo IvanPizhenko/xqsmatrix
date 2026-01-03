@@ -608,6 +608,18 @@ private:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
+
+    if constexpr (std::is_trivial_v<T>) {
+      if (m_column_count > 1) [[likely]] {
+        return;
+      }
+      return;
+    }
+
+    if (m_column_count > 1) [[likely]] {
+      return;
+    }
+
     if (m_column_count > 1) [[likely]] {
       T* p = m_data;
       auto n = m_column_count - 1;
