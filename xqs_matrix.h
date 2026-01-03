@@ -569,11 +569,8 @@ private:
           std::uninitialized_fill_n(p, m_column_count, t);
           p += m_column_count;
         }
-        *p = value;
-        return;
       }
-
-      *m_data = value;
+      *p = value;
       return;
     }
 
