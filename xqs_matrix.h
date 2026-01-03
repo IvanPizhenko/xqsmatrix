@@ -485,12 +485,17 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
-    // TODO: rework and fix
-
     if (m_data == nullptr) [[unlikely]] return;
 
     if constexpr (std::is_trivial_v<T>) {
-      std::uninitialized_fill_n(m_data, m_capacity, v);
+      const auto n = std::min(init.size(), m_capacity);
+      if (n > 0) {
+        std::uninitialized_copy_n(init.begin(), n, m_data);
+      }
+      if (n < m_capacity) {
+        const T a{};
+        std::uninitialized_fill_n(m_data + n, m_capacity - n, a);
+      }
       return;
     }
 
@@ -502,8 +507,10 @@ public:
       for (; p != e && first != last; ++first, ++p) {
         std::construct_at(p, *first);
       }
-      for (; p != e; ++p) {
-        std::construct_at(p, *first);
+      if (p != e) {
+        for (; p != e; ++p) {
+          std::construct_at(p);
+        }
       }
     } catch (...) {
       for (; p != m_data; --p) {
