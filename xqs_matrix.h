@@ -611,13 +611,47 @@ private:
 
     if constexpr (std::is_trivial_v<T>) {
       if (m_column_count > 1) [[likely]] {
+        T* p = m_data;
+        auto n = m_column_count - 1;
+        const T t{};
+        std::uninitialized_fill_n(p, n, t);
+        p += n;
+        --n;
+        for (size_type i = 0; i < m_row_count; ++i) {
+          *p = value;
+          ++p;
+          std::uninitialized_fill_n(p, n, t);
+          p += n;
+        }
+        *p = t;
         return;
       }
+
       return;
     }
 
     if (m_column_count > 1) [[likely]] {
-      return;
+      try {
+        for (const auto e = p + n; p != e; ++p) {
+          std::construct_at(p);
+        }
+        --n;
+        for (size_type i = 0; i < m_row_count; ++i) {
+          std::construct_at(p);
+          ++p;
+          for (const auto e = p + n; p != e; ++p) {
+            std::construct_at(p);
+          }
+        }
+        std::construct_at(p);
+        return;
+      } catch (...) {
+        for (; p != m_data; --p) {
+          std::destroy_at(p);
+        }
+        m_allocator.deallocate(m_data, m_capacity);
+        throw;
+      }
     }
 
     if (m_column_count > 1) [[likely]] {
