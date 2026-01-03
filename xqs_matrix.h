@@ -286,7 +286,7 @@ public:
         *p = *first;
       }
       if (p != e) {
-        const T a{}
+        const T a{};
         for (; p != e; ++p) {
           *p = a;
         }
@@ -337,7 +337,7 @@ public:
         *p = *first;
       }
       if (p != e) {
-        const T a{}
+        const T a{};
         for (; p != e; ++p) {
           *p = a;
         }
@@ -485,6 +485,8 @@ public:
     m_stride(column_count),
     m_is_owner(true)
   {
+    // TODO: rework and fix
+    
     if (m_data == nullptr) [[unlikely]] return;
 
     if constexpr (std::is_trivial_v<T>) {
