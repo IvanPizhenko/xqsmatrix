@@ -157,6 +157,9 @@
 #include <type_traits>
 #include <vector>
 
+/// @brief Matrix class.
+/// @tparam T Element type.
+/// @tparam Alloc Allocator type.
 template <typename T, class Alloc = std::allocator<T>>
 class xqs_matrix {
 public:
@@ -171,6 +174,31 @@ public:
   using const_reference = const T&;
   using pointer = T*;
   using const_pointer = const T*;
+
+private:
+
+  // Tags for private constructors
+
+  struct identity_matrix_tag {};
+  struct transposed_identity_matrix_tag {};
+
+  struct multiplication_by_scalar_tag {};
+  struct division_by_scalar_tag {};
+
+  struct addition_tag {};
+  struct subtraction_tag {};
+  struct multiplication_tag {};
+
+  struct transpose_copy_tag {};
+  struct transpose_move_tag {};
+
+  struct diag_to_hvec_tag {};
+  struct diag_to_vvec_tag {};
+
+  struct window_copy_tag {};
+  struct window_move_tag {};
+
+public:
 
   // Public Constructors
 
@@ -523,28 +551,7 @@ public:
 
 private:
 
-  // Tags for private constructors
-
-  struct identity_matrix_tag {};
-  struct transposed_identity_matrix_tag {};
-
-  struct multiplication_by_scalar_tag {};
-  struct division_by_scalar_tag {};
-
-  struct addition_tag {};
-  struct subtraction_tag {};
-  struct multiplication_tag {};
-
-  struct transpose_copy_tag {};
-  struct transpose_move_tag {};
-
-  struct diag_to_hvec_tag {};
-  struct diag_to_vvec_tag {};
-
-  struct window_copy_tag {};
-  struct window_move_tag {};
-
-  // Private constructors
+// Private constructors
 
   xqs_matrix(
       [[maybe_unused]] identity_matrix_tag tag,
@@ -1098,9 +1105,8 @@ private:
     auto p = m_data;
     auto s = src.m_data + row_offset * src.m_stride + column_offset;
     if (std::is_trivial_v<T>) {
-      const auto n = column_count * sizeof(T);
       for (size_type i = 0; i < row_count; p += column_count, s += src.m_stride, ++i) {
-        std::memcpy(p, s, n);
+        std::uninitialized_copy_n(s, 1, p);
       }
     } else {
       try {
@@ -1136,30 +1142,31 @@ private:
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
+
     auto p = m_data;
     auto s = src.m_data + row_offset * src.m_stride + column_offset;
     if (std::is_trivial_v<T>) {
-      const auto n = column_count * sizeof(T);
       for (size_type i = 0; i < row_count; p += column_count, s += src.m_stride, ++i) {
-        std::memcpy(p, s, n);
+        std::uninitialized_copy_n(s, 1, p);
       }
-    } else {
-      try {
-        const auto e = m_data + m_capacity;
-        for (size_type i = 0; i < row_count; s += src.m_stride, ++i) {
-          auto ss = s;
-          const auto se = ss + column_count;
-          for (; ss != se; ++p, ++ss) {
-            std::construct_at(p, std::move(*ss));
-          }
+      return;
+    }
+
+    try {
+      const auto e = m_data + m_capacity;
+      for (size_type i = 0; i < row_count; s += src.m_stride, ++i) {
+        auto ss = s;
+        const auto se = ss + column_count;
+        for (; ss != se; ++p, ++ss) {
+          std::construct_at(p, std::move(*ss));
         }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
-        }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
       }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
@@ -1178,6 +1185,9 @@ public:
       m_allocator.deallocate(m_data, m_capacity);
     }
   }
+
+
+public:
 
   // Identity matrices
 
