@@ -559,7 +559,6 @@ private:
   {
     if (m_data == nullptr) [[unlikely]] return;
     auto p = m_data;
-
     if constexpr (std::is_trivial_v<T>) {
       if (m_column_count > 1) [[likely]] {
         const T t{};
@@ -616,9 +615,7 @@ private:
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
-
     auto p = m_data;
-
     if constexpr (std::is_trivial_v<T>) {
       if (m_column_count > 1) [[likely]] {
         auto n = m_column_count - 1;
@@ -685,8 +682,8 @@ private:
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
+    auto p = m_data;
     try {
-      auto p = m_data;
       auto l = lhs.m_data;
       const auto e = m_data + m_capacity;
       for (; p != e; ++l, ++p) {
@@ -713,8 +710,8 @@ private:
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
+    auto p = m_data;
     try {
-      auto p = m_data;
       auto l = lhs.m_data;
       const auto e = m_data + m_capacity;
       for (; p != e; ++l, ++p) {
@@ -937,7 +934,9 @@ private:
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
-    auto p = result.m_data;
+
+    auto p = m_data;
+
     try {
       auto l = lhs.m_data;
       const auto e = l + lhs.size();
