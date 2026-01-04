@@ -535,10 +535,8 @@ public:
       for (; p != e && first != last; ++first, ++p) {
         std::construct_at(p, *first);
       }
-      if (p != e) {
-        for (; p != e; ++p) {
-          std::construct_at(p);
-        }
+      for (; p != e; ++p) {
+        std::construct_at(p);
       }
     } catch (...) {
       for (; p != m_data; --p) {
