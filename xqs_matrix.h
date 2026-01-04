@@ -981,7 +981,7 @@ private:
       const auto se = src.m_data + src.m_column_count;
       for (; s != se; ++s) {
         auto ss = s;
-        for (; p != e; ++p, ss + = src.m_stride) {
+        for (; p != e; ++p, ss += src.m_stride) {
           std::construct_at(p, *ss);
         }
       }
@@ -1012,7 +1012,7 @@ private:
       const auto se = src.m_data + src.m_column_count;
       for (; s != se; ++s) {
         auto ss = s;
-        for (; p != e; ++p, ss + = src.m_stride) {
+        for (; p != e; ++p, ss += src.m_stride) {
           std::construct_at(p, std::move(*ss));
         }
       }
@@ -1038,9 +1038,9 @@ private:
     if (empty()) [[unlikely]] return;
     auto p = m_data;
     try {
-      const auto e = p + row_count;
       auto s = src.m_data;
       const auto step = src.m_stride + 1;
+      const auto e = p + row_count;
       for (; p != e; ++p, s += step) {
         std::construct_at(p, *s);
       }
@@ -1066,8 +1066,9 @@ private:
     if (empty()) [[unlikely]] return;
     auto p = m_data;
     try {
-      const auto e = p + row_count;
+      const auto s = src.m_data;
       const auto step = src.m_stride + 1;
+      const auto e = p + row_count;
       for (; p != e; ++p, s += step) {
         std::construct_at(p, *s);
       }
