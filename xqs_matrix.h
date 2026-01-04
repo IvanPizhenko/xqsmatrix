@@ -576,6 +576,7 @@ private:
 
     if (m_column_count > 1) [[likely]] {
       try {
+        const auto step = m_column_count - 1;
         for (size_type i = 0, n = m_row_count - 1; i < n; ++i) {
           std::construct_at(p, value);
           ++p;
@@ -616,9 +617,10 @@ private:
   {
     if (m_data == nullptr) [[unlikely]] return;
 
+    auto p = m_data;
+
     if constexpr (std::is_trivial_v<T>) {
       if (m_column_count > 1) [[likely]] {
-        T* p = m_data;
         auto n = m_column_count - 1;
         const T t{};
         std::uninitialized_fill_n(p, n, t);
@@ -640,6 +642,7 @@ private:
 
     if (m_column_count > 1) [[likely]] {
       try {
+        auto n = m_column_count - 1;
         for (const auto e = p + n; p != e; ++p) {
           std::construct_at(p);
         }
