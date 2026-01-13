@@ -1597,8 +1597,10 @@ public:
   void fix_to_zero(const_reference threshold)
   {
     const T zero{};
-    for (auto& row: m_data) {
-      for (pointer p = row.data(), e = p + row.size(); p != e; ++p) {
+    const auto p0e = m_data + m_row_count * m_stride;
+    for (auto p0 = m_data; p0 != p0e; p0 += m_stride) {
+      const auto pe = p0 + m_column_count;
+      for (pointer p = p0; p != pe; ++p) {
         if (std::fabs(*p) < threshold) {
           *p = zero;
         }
