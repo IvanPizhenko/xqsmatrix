@@ -1461,12 +1461,12 @@ public:
   {
     m.check_is_square();
 
-    xqs_matrix<U, A> rm(m);
-    auto im = xqs_matrix<U, A>::identity(N);
-
     const U zero{};
     const auto N = m.m_row_count;
     const auto N1 = N - 1;
+
+    xqs_matrix<U, A> rm(m);
+    auto im = xqs_matrix<U, A>::identity(N);
 
     for (std::size_t i = 0; i < N - 1; ++i) {
       auto ri = rm.m_data + i * rm.m_stride;
@@ -1535,7 +1535,7 @@ public:
   template <class U, class A>
   friend xqs_matrix<U, A> operator/(const xqs_matrix<U, A>& lhs, const U& rhs)
   {
-    return xqs_matrix<U, A>(xqs_matrix::div_by_sclar_tag{}, lhs, rhs);
+    return xqs_matrix<U, A>(xqs_matrix::div_by_scalar_tag{}, lhs, rhs);
   }
 
   template <class U>
