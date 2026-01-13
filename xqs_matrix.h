@@ -2319,8 +2319,8 @@ std::basic_ostream<Ch, Traits>& operator<<(
   if (!os) [[unlikely]] return os;
 
   auto p0 = m.data();
-  const auto p0e = p0 + row_count * m.stride();
   const auto stride = m.stride();
+  const auto p0e = p0 + row_count * stride;
   for (; p0 != p0e; p0 += stride) {
     auto p = p0;
     const auto pe = p + column_count;
@@ -2354,8 +2354,9 @@ std::basic_istream<Ch, Traits>& operator>>(
   m.resize(row_count, column_count);
 
   auto p0 = m.data();
-  const auto p0e = p0 + row_count * m.stride();
-  for (; p0 != p0e; p0 += m_stride) {
+  const auto stride = m.stride();
+  const auto p0e = p0 + row_count * stride;
+  for (; p0 != p0e; p0 += stride) {
     auto p = p0;
     const auto pe = p + column_count;
     for (; p != pe; ++p) {
