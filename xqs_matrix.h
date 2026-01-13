@@ -1535,8 +1535,7 @@ public:
   template <class U, class A>
   friend xqs_matrix<U, A> operator/(const xqs_matrix<U, A>& lhs, const U& rhs)
   {
-    return xqs_matrix<U, A>(
-        xqs_matrix<U, A>::div_by_sclar_tag{}, lhs, rhs);
+    return xqs_matrix<U, A>(xqs_matrix::div_by_sclar_tag{}, lhs, rhs);
   }
 
   template <class U>
