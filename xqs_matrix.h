@@ -743,9 +743,11 @@ private:
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
+
     auto p = m_data;
     auto l = lhs.m_data;
     auto r = rhs.m_data;
+
     if constexpr (std::is_trivial_v<T>) {
       if (lhs.m_stride == lhs.m_column_count) {
         const auto le = l + lhs.m_row_count * lhs.m_stride;
