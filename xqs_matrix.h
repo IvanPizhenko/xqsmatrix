@@ -182,8 +182,8 @@ private:
   struct identity_matrix_tag {};
   struct transposed_identity_matrix_tag {};
 
-  struct multiplication_by_scalar_tag {};
-  struct division_by_scalar_tag {};
+  struct mult_by_scalar_tag {};
+  struct div_by_scalar_tag {};
 
   struct addition_tag {};
   struct subtraction_tag {};
@@ -676,7 +676,7 @@ private:
   }
 
   xqs_matrix(
-      [[maybe_unused]] multiplication_by_scalar_tag tag,
+      [[maybe_unused]] mult_by_scalar_tag tag,
       const xqs_matrix& lhs,
       const_reference rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_column_count)),
@@ -704,7 +704,7 @@ private:
   }
 
   xqs_matrix(
-      [[maybe_unused]] division_by_scalar_tag tag,
+      [[maybe_unused]] div_by_scalar_tag tag,
       const xqs_matrix& lhs,
       const_reference rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_column_count)),
@@ -1427,7 +1427,7 @@ public:
     auto xr = x.m_data + (N - 1) * x.m_stride;
     auto ar = a.m_data + index[N1] * a.m_stride;
     auto br = b.m_data + index[N1] * b.m_stride;
-    const auto& aa = arow[N - 1];
+    const auto& aa = ar[N - 1];
     if (aa == zero) {
       throw std::runtime_error("xqs_matrix: matrix can't be inverted 3");
     }
@@ -1523,22 +1523,20 @@ public:
   template <class U, class A>
   friend xqs_matrix<U, A> operator*(const xqs_matrix<U, A>& lhs, const U& rhs)
   {
-    return xqs_matrix<U, A>(
-        xqs_matrix<U, A>::multiplication_by_scalar_tag{}, lhs, rhs);
+    return xqs_matrix<U, A>(xqs_matrix::mult_by_scalar_tag{}, lhs, rhs);
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> operator*(const U& lhs, const xqs_matrix<U, A>& rhs)
   {
-    return xqs_matrix<U, A>(
-        xqs_matrix<U, A>::multiplication_by_scalar_tag{}, rhs, lhs);
+    return xqs_matrix<U, A>(xqs_matrix::mult_by_scalar_tag{}, rhs, lhs);
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> operator/(const xqs_matrix<U, A>& lhs, const U& rhs)
   {
     return xqs_matrix<U, A>(
-        xqs_matrix<U, A>::division_by_sclar_tag{}, lhs, rhs);
+        xqs_matrix<U, A>::div_by_sclar_tag{}, lhs, rhs);
   }
 
   template <class U>
