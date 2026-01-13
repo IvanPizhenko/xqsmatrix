@@ -973,9 +973,9 @@ private:
       const xqs_matrix& src) :
     m_capacity(validate_dimensions(src.m_column_count, src.m_row_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
-    m_row_count(m_column_count),
-    m_column_count(m_row_count),
-    m_stride(m_row_count),
+    m_row_count(src.m_column_count),
+    m_column_count(src.m_row_count),
+    m_stride(src.m_row_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -1004,9 +1004,9 @@ private:
       xqs_matrix&& src) :
     m_capacity(validate_dimensions(src.m_column_count, src.m_row_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
-    m_row_count(m_column_count),
-    m_column_count(m_row_count),
-    m_stride(m_row_count),
+    m_row_count(src.m_column_count),
+    m_column_count(src.m_row_count),
+    m_stride(src.m_row_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -1035,7 +1035,7 @@ private:
       const xqs_matrix& src) :
     m_capacity(validate_dimensions(src.m_column_count, 1)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
-    m_row_count(m_row_count),
+    m_row_count(src.m_row_count),
     m_column_count(1),
     m_stride(1),
     m_is_owner(true)
@@ -1064,8 +1064,8 @@ private:
     m_capacity(validate_dimensions(1, src.m_column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(1),
-    m_column_count(m_column_count),
-    m_stride(m_column_count),
+    m_column_count(src.m_column_count),
+    m_stride(src.m_column_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
