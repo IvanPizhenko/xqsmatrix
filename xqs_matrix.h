@@ -2320,7 +2320,8 @@ std::basic_ostream<Ch, Traits>& operator<<(
 
   auto p0 = m.data();
   const auto p0e = p0 + row_count * m.stride();
-  for (; p0 != p0e; p0 += m_stride) {
+  const auto stride = m.stride();
+  for (; p0 != p0e; p0 += stride) {
     auto p = p0;
     const auto pe = p + column_count;
     os << *p;
