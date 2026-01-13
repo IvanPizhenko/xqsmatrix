@@ -1865,9 +1865,9 @@ public:
         auto ps = m_data + (min_rows - 1) * m_stride;
         auto pd = m_data;
         // TODO: recheck carefully for loop condition correctness
-        for (size_type r = min_rows; pse > m_data;
+        for (size_type r = min_rows; ps > m_data;
              ps -= m_stride, pd += new_cols) {
-          std::copy_n(pse, min_cols, pd);
+          std::copy_n(ps, min_cols, pd);
         }
       }
     }
