@@ -2207,7 +2207,7 @@ private:
 
     // Find the rescaling factors, one from each row
     const T zero{};
-    auto c = m_allocartor.allocate(N);
+    auto c = m_allocator.allocate(N);
     auto pc = c;
     const auto pce = c + N;
     try {
