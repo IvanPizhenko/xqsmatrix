@@ -1200,7 +1200,7 @@ public:
       const size_type dimension,
       const_reference value = T(1))
   {
-    return xqs_matrix(trasnposed_identity_matrix_tag{}, dimension, value);
+    return xqs_matrix(transposed_identity_matrix_tag{}, dimension, value);
   }
 
   // Helper functions
@@ -1353,11 +1353,11 @@ public:
 
   template <typename U, typename A>
   friend xqs_matrix<U, A> operator*(
-      const xqs_matrix<U, A>& lhs,
-      const xqs_matrix<U, A>& rhs)
+    const xqs_matrix<U, A>& lhs,
+    const xqs_matrix<U, A>& rhs)
   {
     lhs.check_suitable_for_product(rhs);
-    return xqs_matrix<U, A>(xqs_matrix<U, A>::multiplication_tag{}, lhs, rhs);
+    return {xqs_matrix<U, A>::multiplication_tag(), lhs, rhs};
   }
 
   template <class U, class A>
