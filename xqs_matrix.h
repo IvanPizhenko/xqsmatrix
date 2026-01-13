@@ -1357,43 +1357,39 @@ public:
     const xqs_matrix<U, A>& rhs)
   {
     lhs.check_suitable_for_product(rhs);
-    return {xqs_matrix<U, A>::multiplication_tag(), lhs, rhs};
+    return {xqs_matrix::multiplication_tag{}, lhs, rhs};
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> diag_to_hvec(const xqs_matrix<U, A>& m)
   {
     m.check_is_square(m);
-    return xqs_matrix<U, A>(xqs_matrix<U, A>::diag_to_hvec_tag{}, m);
+    return xqs_matrix<U, A>(xqs_matrix::diag_to_hvec_tag{}, m);
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> diag_to_vvec(const xqs_matrix<U, A>& m)
   {
     m.check_is_square(m);
-    return xqs_matrix<U, A>(xqs_matrix<U, A>::diag_to_vvec_tag{}, m);
+    return xqs_matrix<U, A>(xqs_matrix::diag_to_vvec_tag{}, m);
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> transpose_copy(const xqs_matrix<U, A>& m)
   {
-    return xqs_matrix<U, A>(xqs_matrix<U, A>::transpose_copy_tag{}, m);
+    return xqs_matrix<U, A>(xqs_matrix::transpose_copy_tag{}, m);
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> transpose_move(xqs_matrix<U, A>& m)
   {
-    return xqs_matrix<U, A>(
-      xqs_matrix<U, A>::transpose_move_tag{},
-      std::move(m));
+    return xqs_matrix<U, A>(xqs_matrix::transpose_move_tag{}, std::move(m));
   }
 
   template <class U, class A>
   friend xqs_matrix<U, A> transpose_move(xqs_matrix<U, A>&& m)
   {
-    return xqs_matrix<U, A>(
-      xqs_matrix<U, A>::transpose_move_tag{},
-      std::move(m));
+    return xqs_matrix<U, A>(xqs_matrix::transpose_move_tag{}, std::move(m));
   }
 
   template <class U, class A>
