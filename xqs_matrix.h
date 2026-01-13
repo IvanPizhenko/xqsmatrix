@@ -1866,7 +1866,7 @@ public:
         auto pd = m_data;
         // TODO: recheck carefully for loop condition correctness
         for (size_type r = min_rows; pse > m_data;
-             pse -= m_stride, pd += new_cols) {
+             ps -= m_stride, pd += new_cols) {
           std::copy_n(pse, min_cols, pd);
         }
       }
