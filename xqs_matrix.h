@@ -5,7 +5,7 @@
 // https://www.quantstart.com/articles/Matrix-Classes-in-C-The-Header-File
 // https://www.quantstart.com/articles/Matrix-Classes-in-C-The-Source-File
 //
-// Copyright (c) 2015, 2016, 2017, 2018, 2020, 2024, 2025 Ivan Pizhenko.
+// Copyright (c) 2015-2018, 2020, 2024-2026 Ivan Pizhenko.
 // All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
