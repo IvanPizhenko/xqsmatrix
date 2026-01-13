@@ -933,9 +933,9 @@ private:
       const xqs_matrix& rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, rhs.m_column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
-    m_row_count(m_row_count),
-    m_column_count(m_column_count),
-    m_stride(m_column_count),
+    m_row_count(lhs.m_row_count),
+    m_column_count(rhs.m_column_count),
+    m_stride(rhs.m_column_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
