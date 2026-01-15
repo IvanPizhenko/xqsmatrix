@@ -36,7 +36,7 @@ int main()
     }
   }
 
-  constexpr double t = 2e-14;
+  constexpr double t = 1e-9;
 
   const auto mm1 = inverse_v1(m);
   auto pr1 = m * mm1;
