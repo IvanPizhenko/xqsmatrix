@@ -883,50 +883,51 @@ private:
           }
         }
       }
-    } else {
-      try {
-        if (lhs.m_stride == lhs.m_column_count) {
-          const auto le = l + lhs.m_row_count * lhs.m_stride;
-          if (rhs.m_stride == rhs.m_column_count) {
-            for (; l != le; ++p, ++r, ++l) {
-              std::construct_at(p, *l - *r);
-            }
-          } else {
-            for (; l != le; r += rhs.m_stride) {
-              auto rr = r;
-              const auto e = r + rhs.m_column_count;
-              for (; rr != e; ++p, ++l, ++rr) {
-                std::construct_at(p, *l - *rr);
-              }
-            }
-          }
-        } else if (rhs.m_stride == rhs.m_column_count) {
-          const auto re = r + rhs.m_row_count * rhs.m_stride;
-          for (; r != re; l += m_stride) {
-            auto ll = l;
-            const auto le = l + lhs.m_column_count;
-            for (; ll != le; ++p, ++r, ++ll) {
-              std::construct_at(p, *ll - *r);
-            }
+      return;
+    }
+
+    try {
+      if (lhs.m_stride == lhs.m_column_count) {
+        const auto le = l + lhs.m_row_count * lhs.m_stride;
+        if (rhs.m_stride == rhs.m_column_count) {
+          for (; l != le; ++p, ++r, ++l) {
+            std::construct_at(p, *l - *r);
           }
         } else {
-          for (std::size_t i = 0; i < m_row_count;
-               l += m_stride, r += rhs.m_stride, ++i) {
+          for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            auto ll = l;
-            const auto le = l + lhs.m_column_count;
-            for (; ll != le; ++p, ++rr, ++ll) {
-              std::construct_at(p, *ll - *rr);
+            const auto e = r + rhs.m_column_count;
+            for (; rr != e; ++p, ++l, ++rr) {
+              std::construct_at(p, *l - *rr);
             }
           }
         }
-      } catch (...) {
-        for (; p != m_data; --p) {
-          std::destroy_at(p);
+      } else if (rhs.m_stride == rhs.m_column_count) {
+        const auto re = r + rhs.m_row_count * rhs.m_stride;
+        for (; r != re; l += m_stride) {
+          auto ll = l;
+          const auto le = l + lhs.m_column_count;
+          for (; ll != le; ++p, ++r, ++ll) {
+            std::construct_at(p, *ll - *r);
+          }
         }
-        m_allocator.deallocate(m_data, m_capacity);
-        throw;
+      } else {
+        for (std::size_t i = 0; i < m_row_count;
+              l += m_stride, r += rhs.m_stride, ++i) {
+          auto rr = r;
+          auto ll = l;
+          const auto le = l + lhs.m_column_count;
+          for (; ll != le; ++p, ++rr, ++ll) {
+            std::construct_at(p, *ll - *rr);
+          }
+        }
       }
+    } catch (...) {
+      for (; p != m_data; --p) {
+        std::destroy_at(p);
+      }
+      m_allocator.deallocate(m_data, m_capacity);
+      throw;
     }
   }
 
