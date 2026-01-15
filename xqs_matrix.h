@@ -769,7 +769,7 @@ private:
         for (; r != re; l += m_stride) {
           auto ll = l;
           const auto le = l + lhs.m_column_count;
-          for (; ll != le; ++p, ++r, +ll) {
+          for (; ll != le; ++p, ++r, ++ll) {
             *p = *ll + *r;
           }
         }
@@ -808,7 +808,7 @@ private:
         for (; r != re; l += m_stride) {
           auto ll = l;
           const auto lend = l + lhs.m_column_count;
-          for (; ll != lend; ++p, ++r, +ll) {
+          for (; ll != lend; ++p, ++r, ++ll) {
             std::construct_at(p, *ll + *r);
           }
         }
@@ -868,7 +868,7 @@ private:
         for (; r != re; l += m_stride) {
           auto ll = l;
           const auto lend = l + lhs.m_column_count;
-          for (; ll != lend; ++p, ++r, +ll) {
+          for (; ll != lend; ++p, ++r, ++ll) {
             *p = *ll - *r;
           }
         }
@@ -905,7 +905,7 @@ private:
           for (; r != re; l += m_stride) {
             auto ll = l;
             const auto le = l + lhs.m_column_count;
-            for (; ll != le; ++p, ++r, +ll) {
+            for (; ll != le; ++p, ++r, ++ll) {
               std::construct_at(p, *ll - *r);
             }
           }
