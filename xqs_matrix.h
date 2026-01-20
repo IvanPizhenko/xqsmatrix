@@ -135,6 +135,7 @@
 //
 // 16. Additional I/O operations:
 //     - [ ] read_csv()
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef XQS_MATRIX_H__
@@ -1399,7 +1400,7 @@ public:
   template <class U, class A>
   friend xqs_matrix<U, A> inverse_v1(const xqs_matrix<U, A>& m)
   {
-    // Based on the ideas from 
+    // Based on the ideas from
     // http://www.sanfoundry.com/java-program-find-inverse-matrix/
 
     m.check_is_square();
@@ -1439,7 +1440,7 @@ public:
     for (std::size_t i = 0; i < N; ++i) {
       xr[i] = br[i] / ar[N1];
       for (auto jj = N1, j = N1 - 1; jj > 0; --j, --jj) {
-        auto& xji = x.m_data[j * x.m_stride + i]; 
+        auto& xji = x.m_data[j * x.m_stride + i];
         xji = b.m_data[index[j] * b.m_stride + i];
 
         auto px = x.m_data + jj * x.m_stride + i;
@@ -1587,7 +1588,7 @@ public:
     }
     return *this;
   }
-  
+
   // Add "count" columns at postion "pos" with inital value "v"
   void insert_columns(
       size_type pos,
@@ -1807,7 +1808,7 @@ public:
     const auto new_capacity = validate_dimensions(new_rows, new_cols);
     if (new_capacity > m_capacity) {
       auto new_data = new_capacity != 0
-          ? m_allocator.allocate(new_capacity) 
+          ? m_allocator.allocate(new_capacity)
           : nullptr;
       if (new_data != nullptr) {
         auto p = new_data;
@@ -1910,7 +1911,7 @@ public:
               }
             }
           }
-          
+
           // Default-initialize remaining elements
           if constexpr (!std::is_trivial_v<T>) {
             const auto e = new_data + new_capacity;
@@ -1969,7 +1970,7 @@ public:
 
     if (new_capacity < m_capacity) {
       auto new_data = new_capacity != 0
-          ? m_allocator.allocate(new_capacity) 
+          ? m_allocator.allocate(new_capacity)
           : nullptr;
 
       if (new_data != nullptr) {
@@ -2128,7 +2129,7 @@ private:
     std::ostringstream err;
     err << "xqs_matrix: dimensions of the other matrix differ "
         << m_row_count << '*' << m_column_count << " vs "
-        << other.m_row_count << '*' << other.m_column_count << ')'; 
+        << other.m_row_count << '*' << other.m_column_count << ')';
     throw std::invalid_argument(err.str());
   }
 
@@ -2141,7 +2142,7 @@ private:
     err << "xqs_matrix: dimensions of the other matrix are not suitable"
             " for the product [this * other] ("
         << m_row_count << '*' << m_column_count << " vs "
-        << other.m_row_count << '*' << other.m_column_count << ')'; 
+        << other.m_row_count << '*' << other.m_column_count << ')';
     throw std::invalid_argument(err.str());
   }
 
@@ -2321,7 +2322,7 @@ std::basic_ostream<Ch, Traits>& operator<<(
   if (!os) [[unlikely]] return os;
   os << column_count;
   if (!os) [[unlikely]] return os;
-  os << Ch('\n'); 
+  os << Ch('\n');
   if (!os) [[unlikely]] return os;
 
   auto p0 = m.data();
