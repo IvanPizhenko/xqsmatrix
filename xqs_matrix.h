@@ -131,8 +131,8 @@
 //     - [x] gaussian_reduction()
 //
 // 15. Stream operations:
-//     - [x] operator<<
-//     - [ ] operator>>
+//     - [x] operator<<()
+//     - [x] operator>>()
 //
 // 16. Additional I/O operations:
 //     - [ ] read_csv()
@@ -2377,33 +2377,6 @@ std::basic_istream<Ch, Traits>& operator>>(
 }
 
 
-#if 0
-
-// Tokenize string and parse tokens as matrix cell values.
-// This code is based on the public domain code taken from here:
-// https://stackoverflow.com/a/1493195/1540501
-template <typename T, typename Converter>
-std::vector<T> parse_vector(
-  const std::string_view& str,
-  const Converter& conv,
-  const std::string_view& delims = " ",
-  const bool trim_empty = false)
-{
-  std::vector<T> result;
-  std::string::size_type pos, last_pos = 0, length = str.length();
-  while (last_pos < length + 1) {
-    pos = str.find_first_of(delims, last_pos);
-    if (pos == std::string::npos) {
-      pos = length;
-    }
-    if (pos != last_pos || !trim_empty) {
-      result.push_back(conv(str.substr(last_pos, pos - last_pos)));
-    }
-    last_pos = pos + 1;
-  }
-  return result;
-}
-
 template <typename U, typename Converter>
 xqs_matrix<U> read_csv(
   const std::string& path,
@@ -2456,7 +2429,5 @@ xqs_matrix<U> read_csv(
 
   return result;
 }
-
-#endif
 
 #endif // XQS_MATRIX_H__
