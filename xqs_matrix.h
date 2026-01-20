@@ -2383,7 +2383,7 @@ xqs_matrix<U> read_csv(
   const char line_delim,
   const std::string_view& field_delims,
   const Converter& conv,
-  const std::size_t header_line_count)
+  const bool has_header_line)
 {
   xqs_matrix<U> result;
 
@@ -2394,12 +2394,10 @@ xqs_matrix<U> read_csv(
   }
 
   // Skip header lines
-  auto i = header_line_count;
-  for (; i > 0; --i) {
-    if (!in.ignore(std::numeric_limits<std::streamsize>::max(), line_delim)) break;
-  }
-  if (i > 0) {
-    throw std::runtime_error("read_csv: missing header lines");
+  if (has_header_line) {
+    if (!in.ignore(std::numeric_limits<std::streamsize>::max(), line_delim)) {
+        throw std::runtime_error("read_csv: missing header lines");
+    }
   }
 
   // Parse data lines
