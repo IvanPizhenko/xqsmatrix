@@ -2396,7 +2396,7 @@ xqs_matrix<U> read_csv(
   // Skip header lines
   if (has_header_line) {
     if (!in.ignore(std::numeric_limits<std::streamsize>::max(), line_delim)) {
-        throw std::runtime_error("read_csv: missing header lines");
+      throw std::runtime_error("read_csv: missing header lines");
     }
   }
 
