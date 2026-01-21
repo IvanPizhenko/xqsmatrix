@@ -2389,9 +2389,9 @@ void split()
 template <
     typename T,
     typename Alloc,
-    typename Converter,
     typename Ch,
     typename Traits,
+    typename Converter
 >
 xqs_matrix<T, Alloc> read_csv(
   const std::filesystem::path& path,
