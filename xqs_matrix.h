@@ -2417,8 +2417,8 @@ xqs_matrix<T, Alloc> read_csv(
     std::getline(in, line, line_delim);
     if (!in) throw std::runtime_error("read_csv: can't read file header");
     col_count = std::count_if(
-        line.cbegin(), line.cend(),
-        [](const auto c) noexcept { return field_delims.contains(c); }
+      line.cbegin(), line.cend(),
+      [](const auto c) noexcept { return field_delims.contains(c); }
     ) + 1;
   }
 
