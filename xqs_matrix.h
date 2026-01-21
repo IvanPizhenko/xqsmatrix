@@ -2412,9 +2412,14 @@ xqs_matrix<T, Alloc> read_csv(
   std::string line;
 
   // Skip header lines
+  std::size_t col_count = 0;
   if (has_header_line) {
-    std::getlinr(in, line, line_delim);
+    std::getline(in, line, line_delim);
     if (!in) throw std::runtime_error("read_csv: can't read file header");
+    col_count = std::count_if(
+        line.cbegin(), line.cend(),
+        [](const auto c) noexcept { return field_delims.contains(c); }
+    ) + 1;
   }
 
   // Parse data lines
