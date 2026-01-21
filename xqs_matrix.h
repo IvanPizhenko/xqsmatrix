@@ -2439,11 +2439,6 @@ xqs_matrix<T, Alloc> read_csv(
     ++result.m_row_count;
   }
 
-  // Ensure that at least one row have been successfully read
-  if (data_line_count == 0) {
-    throw std::runtime_error("read_csv: there is no data");
-  }
-
   return result;
 }
 
