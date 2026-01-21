@@ -2423,9 +2423,9 @@ xqs_matrix<T, Alloc> read_csv(
   }
 
   // Parse data lines
-  std::size_t data_line_count = 0;
+  std::size_t row_count = 0;
   while (std::getline(in, line, line_delim)) {
-    ++data_line_count;
+    ++row_count;
     auto row = parse_vector(line, conv, field_delims);
     if (row.empty()) {
       throw std::runtime_error("read_csv: there is empty data line");
