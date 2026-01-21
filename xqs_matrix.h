@@ -1230,7 +1230,7 @@ public:
   xqs_matrix& operator=(const xqs_matrix& rhs)
   {
     if (&rhs != this) [[likely]] {
-      xqs_matrix tmp(rhs);
+      xqs_matrix tmp{rhs};
       do_move_assign(std::move(tmp));
     }
     return *this;
@@ -1413,7 +1413,7 @@ public:
     const auto N = m.m_row_count;
     const auto N1 = N - 1;
 
-    xqs_matrix<U, A> a(m);
+    xqs_matrix<U, A> a{m};
     const auto index = a.gaussian_reduction();
 
     // Update the matrix b[i][j] with the ratios stored
@@ -1432,7 +1432,7 @@ public:
     }
 
     // Perform backward substitutions
-    xqs_matrix<U, A> x(N, N);
+    xqs_matrix<U, A> x{N, N};
     auto xr = x.m_data + (N - 1) * x.m_stride;
     auto ar = a.m_data + index[N1] * a.m_stride;
     auto br = b.m_data + index[N1] * b.m_stride;
@@ -1474,7 +1474,7 @@ public:
     const auto N = m.m_row_count;
     const auto N1 = N - 1;
 
-    xqs_matrix<U, A> rm(m);
+    xqs_matrix<U, A> rm{m};
     auto im = xqs_matrix<U, A>::identity(N);
 
     for (std::size_t i = 0; i < N - 1; ++i) {
@@ -2080,7 +2080,7 @@ public:
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
     validate_column_index(col + column_count - 1);
-    xqs_matrix result(row_count, column_count);
+    xqs_matrix result{row_count, column_count};
     if (!result.empty()) {
       auto s = m_data + row * m_stride + col;
       auto d = result.m_data;
@@ -2102,7 +2102,7 @@ public:
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
     validate_column_index(col + column_count - 1);
-    xqs_matrix result(row_count, column_count);
+    xqs_matrix result{row_count, column_count};
     if (!result.empty()) {
       auto s = m_data + row * m_stride + col;
       auto d = result.m_data;
