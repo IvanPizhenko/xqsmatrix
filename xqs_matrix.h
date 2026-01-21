@@ -2392,12 +2392,11 @@ template <
     typename Converter,
     typename Ch,
     typename Traits,
-    typename StrAlloc
 >
 xqs_matrix<T, Alloc> read_csv(
   const std::filesystem::path& path,
   const Ch line_delim,
-  const std::basic_string_view<Ch>& field_delims,
+  const std::basic_string_view<Ch, Traits>& field_delims,
   const Converter& conv,
   const bool has_header_line = true)
 {
