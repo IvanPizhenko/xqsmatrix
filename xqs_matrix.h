@@ -2127,7 +2127,6 @@ private:
   {
     if (m_row_count == other.m_row_count &&
         m_column_count == other.m_column_count) [[likely]] return;
-
     std::ostringstream err;
     err << "xqs_matrix: dimensions of the other matrix differ "
         << m_row_count << '*' << m_column_count << " vs "
@@ -2139,7 +2138,6 @@ private:
   void check_suitable_for_product(const xqs_matrix<T>& other) const
   {
     if (m_column_count == other.m_row_count) [[likely]] return;
-
     std::ostringstream err;
     err << "xqs_matrix: dimensions of the other matrix are not suitable"
             " for the product [this * other] ("
@@ -2152,7 +2150,6 @@ private:
   void check_is_square() const
   {
     if (m_row_count == m_column_count) [[unlikely]] return;
-
     std::ostringstream err;
     err << "xqs_matrix: matrix is not square ("
         << m_row_count << '*' << m_column_count << ')';
@@ -2163,7 +2160,6 @@ private:
   void validate_row_index(const size_type row) const
   {
     if (row < m_row_count) [[likely]] return;
-
     std::ostringstream err;
     err << "xqs_matrix: row index " << row << " is out of range ("
         << m_row_count << ')';
