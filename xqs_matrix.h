@@ -151,6 +151,7 @@
 
 // STL
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <numeric>
@@ -2376,33 +2377,48 @@ std::basic_istream<Ch, Traits>& operator>>(
   return is;
 }
 
+namespace detail {
 
-template <typename U, typename Converter>
-xqs_matrix<U> read_csv(
-  const std::string& path,
-  const char line_delim,
-  const std::string_view& field_delims,
-  const Converter& conv,
-  const bool has_header_line)
+void split()
 {
-  xqs_matrix<U> result;
+
+}
+
+} // namespace detail
+
+template <
+    typename T,
+    typename Alloc,
+    typename Converter,
+    typename Ch,
+    typename Traits,
+    typename StrAlloc
+>
+xqs_matrix<T, Alloc> read_csv(
+  const std::filesystem::path& path,
+  const Ch line_delim,
+  const std::basic_string_view<Ch>& field_delims,
+  const Converter& conv,
+  const bool has_header_line = true)
+{
+  xqs_matrix<U, Alloc> result;
 
   // Open input file
-  std::ifstream in(path.c_str());
+  std::basic_ifstream<Ch, Traits> in(path.c_str());
   if (!in.is_open()) {
     throw std::runtime_error("read_csv: can't open input file");
   }
 
+  std::string line;
+
   // Skip header lines
   if (has_header_line) {
-    if (!in.ignore(std::numeric_limits<std::streamsize>::max(), line_delim)) {
-      throw std::runtime_error("read_csv: missing header lines");
-    }
+    std::getlinr(in, line, line_delim);
+    if (!in) throw std::runtime_error("read_csv: can't read file header");
   }
 
   // Parse data lines
   std::size_t data_line_count = 0;
-  std::string line;
   while (std::getline(in, line, line_delim)) {
     ++data_line_count;
     auto row = parse_vector(line, conv, field_delims);
