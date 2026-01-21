@@ -8,8 +8,8 @@
 // Copyright (c) 2015-2018, 2020, 2024-2026 Ivan Pizhenko.
 // All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"),
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the
@@ -1110,7 +1110,8 @@ private:
     auto p = m_data;
     auto s = src.m_data + row_offset * src.m_stride + column_offset;
     if (std::is_trivial_v<T>) {
-      for (size_type i = 0; i < row_count; p += column_count, s += src.m_stride, ++i) {
+      for (size_type i = 0; i < row_count; p += column_count,
+           s += src.m_stride, ++i) {
         std::uninitialized_copy_n(s, 1, p);
       }
     } else {
@@ -1151,7 +1152,8 @@ private:
     auto p = m_data;
     auto s = src.m_data + row_offset * src.m_stride + column_offset;
     if (std::is_trivial_v<T>) {
-      for (size_type i = 0; i < row_count; p += column_count, s += src.m_stride, ++i) {
+      for (size_type i = 0; i < row_count;
+           p += column_count, s += src.m_stride, ++i) {
         std::uninitialized_copy_n(s, 1, p);
       }
       return;
@@ -2177,7 +2179,9 @@ private:
   }
 
   // Initial validation of dimensions
-  static size_type validate_dimensions(const size_type row_count, const size_type column_count)
+  static size_type validate_dimensions(
+      const size_type row_count,
+      const size_type column_count)
   {
     if (row_count == 0 || column_count == 0) [[unlikely]] return 0;
     if (column_count > max_size() / row_count) [[unlikely]] {
