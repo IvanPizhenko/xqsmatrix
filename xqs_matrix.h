@@ -209,7 +209,7 @@ public:
     m_capacity(0),
     m_data(nullptr),
     m_row_count(0),
-    m_column_count(0),
+    m_col_count(0),
     m_stride(0),
     m_is_owner(true)
   {
@@ -221,7 +221,7 @@ public:
     m_capacity(0),
     m_data(nullptr),
     m_row_count(0),
-    m_column_count(0),
+    m_col_count(0),
     m_stride(0),
     m_is_owner(true)
   {
@@ -231,7 +231,7 @@ public:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -266,7 +266,7 @@ public:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -303,7 +303,7 @@ public:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -352,7 +352,7 @@ public:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -400,8 +400,8 @@ public:
       ? (m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr)
       : src.m_data),
     m_row_count(src.m_row_count),
-    m_column_count(src.m_column_count),
-    m_stride(m_column_count),
+    m_col_count(src.m_col_count),
+    m_stride(m_col_count),
     m_is_owner(src.m_is_owner)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -433,8 +433,8 @@ public:
       ? (m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr)
       : src.m_data),
     m_row_count(src.m_row_count),
-    m_column_count(src.m_column_count),
-    m_stride(m_column_count),
+    m_col_count(src.m_col_count),
+    m_stride(m_col_count),
     m_is_owner(src.m_is_owner)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -465,12 +465,12 @@ public:
     m_capacity(src.m_capacity),
     m_data(src.m_data),
     m_row_count(src.m_row_count),
-    m_column_count(src.m_column_count),
+    m_col_count(src.m_col_count),
     m_stride(src.m_stride),
     m_is_owner(src.m_is_owner)
   {
     src.m_data = nullptr;
-    src.m_capacity = src.m_row_count = src.m_column_count = src.m_stride = 0;
+    src.m_capacity = src.m_row_count = src.m_col_count = src.m_stride = 0;
     src.m_is_owner = true;
   }
 
@@ -480,12 +480,12 @@ public:
     m_capacity(src.m_capacity),
     m_data(src.m_data),
     m_row_count(src.m_row_count),
-    m_column_count(src.m_column_count),
+    m_col_count(src.m_col_count),
     m_stride(src.m_stride),
     m_is_owner(src.m_is_owner)
   {
     src.m_data = nullptr;
-    src.m_capacity = src.m_row_count = src.m_column_count = src.m_stride = 0;
+    src.m_capacity = src.m_row_count = src.m_col_count = src.m_stride = 0;
     src.m_is_owner = true;
   }
 
@@ -497,7 +497,7 @@ public:
     m_capacity(0),
     m_data(data),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(stride),
     m_is_owner(false)
   {
@@ -512,7 +512,7 @@ public:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -561,29 +561,29 @@ private:
     m_capacity(validate_dimensions(dimension, dimension)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(dimension),
-    m_column_count(dimension),
+    m_col_count(dimension),
     m_stride(dimension),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
     auto p = m_data;
     if constexpr (std::is_trivial_v<T>) {
-      if (m_column_count > 1) [[likely]] {
+      if (m_col_count > 1) [[likely]] {
         const T t{};
         for (size_type i = 0, n = m_row_count - 1; i < n; ++i) {
           *p = value;
           ++p;
-          std::uninitialized_fill_n(p, m_column_count, t);
-          p += m_column_count;
+          std::uninitialized_fill_n(p, m_col_count, t);
+          p += m_col_count;
         }
       }
       *p = value;
       return;
     }
 
-    if (m_column_count > 1) [[likely]] {
+    if (m_col_count > 1) [[likely]] {
       try {
-        const auto step = m_column_count - 1;
+        const auto step = m_col_count - 1;
         for (size_type i = 0, n = m_row_count - 1; i < n; ++i) {
           std::construct_at(p, value);
           ++p;
@@ -618,15 +618,15 @@ private:
     m_capacity(validate_dimensions(dimension, dimension)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(dimension),
-    m_column_count(dimension),
+    m_col_count(dimension),
     m_stride(dimension),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
     auto p = m_data;
     if constexpr (std::is_trivial_v<T>) {
-      if (m_column_count > 1) [[likely]] {
-        auto n = m_column_count - 1;
+      if (m_col_count > 1) [[likely]] {
+        auto n = m_col_count - 1;
         const T t{};
         std::uninitialized_fill_n(p, n, t);
         p += n;
@@ -645,9 +645,9 @@ private:
       return;
     }
 
-    if (m_column_count > 1) [[likely]] {
+    if (m_col_count > 1) [[likely]] {
       try {
-        auto n = m_column_count - 1;
+        auto n = m_col_count - 1;
         for (const auto e = p + n; p != e; ++p) {
           std::construct_at(p);
         }
@@ -682,11 +682,11 @@ private:
       [[maybe_unused]] mult_by_scalar_tag tag,
       const xqs_matrix& lhs,
       const_reference rhs) :
-    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_column_count)),
+    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(m_row_count),
-    m_column_count(m_column_count),
-    m_stride(m_column_count),
+    m_col_count(m_col_count),
+    m_stride(m_col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -710,11 +710,11 @@ private:
       [[maybe_unused]] div_by_scalar_tag tag,
       const xqs_matrix& lhs,
       const_reference rhs) :
-    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_column_count)),
+    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(m_row_count),
-    m_column_count(m_column_count),
-    m_stride(m_column_count),
+    m_col_count(m_col_count),
+    m_stride(m_col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -738,11 +738,11 @@ private:
       [[maybe_unused]] addition_tag tag,
       const xqs_matrix& lhs,
       const xqs_matrix& rhs) :
-    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_column_count)),
+    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(lhs.m_row_count),
-    m_column_count(rhs.m_column_count),
-    m_stride(lhs.m_column_count),
+    m_col_count(rhs.m_col_count),
+    m_stride(lhs.m_col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -752,26 +752,26 @@ private:
     auto r = rhs.m_data;
 
     if constexpr (std::is_trivial_v<T>) {
-      if (lhs.m_stride == lhs.m_column_count) {
+      if (lhs.m_stride == lhs.m_col_count) {
         const auto le = l + lhs.m_row_count * lhs.m_stride;
-        if (rhs.m_stride == rhs.m_column_count) {
+        if (rhs.m_stride == rhs.m_col_count) {
           for (; l != le; ++p, ++r, ++l) {
             *p = *l + *r;
           }
         } else {
           for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            const auto e = r + rhs.m_column_count;
+            const auto e = r + rhs.m_col_count;
             for (; rr != e; ++p, ++l, ++rr) {
               *p = *l + *rr;
             }
           }
         }
-      } else if (rhs.m_stride == rhs.m_column_count) {
+      } else if (rhs.m_stride == rhs.m_col_count) {
         const auto re = r + rhs.m_row_count * rhs.m_stride;
         for (; r != re; l += m_stride) {
           auto ll = l;
-          const auto le = l + lhs.m_column_count;
+          const auto le = l + lhs.m_col_count;
           for (; ll != le; ++p, ++r, ++ll) {
             *p = *ll + *r;
           }
@@ -781,7 +781,7 @@ private:
              l += m_stride, r += rhs.m_stride, ++i) {
           auto rr = r;
           auto ll = l;
-          const auto le = l + lhs.m_column_count;
+          const auto le = l + lhs.m_col_count;
           for (; ll != le; ++p, ++rr, ++ll) {
             *p = *ll + *rr;
           }
@@ -791,26 +791,26 @@ private:
     }
 
     try {
-      if (lhs.m_stride == lhs.m_column_count) {
+      if (lhs.m_stride == lhs.m_col_count) {
         const auto le = l + lhs.m_row_count * lhs.m_stride;
-        if (rhs.m_stride == rhs.m_column_count) {
+        if (rhs.m_stride == rhs.m_col_count) {
           for (; l != le; ++p, ++r, ++l) {
             std::construct_at(p, *l + *r);
           }
         } else {
           for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            const auto e = r + rhs.m_column_count;
+            const auto e = r + rhs.m_col_count;
             for (; rr != e; ++p, ++l, ++rr) {
               std::construct_at(p, *l + *rr);
             }
           }
         }
-      } else if (rhs.m_stride == rhs.m_column_count) {
+      } else if (rhs.m_stride == rhs.m_col_count) {
         const auto re = r + rhs.m_row_count * rhs.m_stride;
         for (; r != re; l += m_stride) {
           auto ll = l;
-          const auto lend = l + lhs.m_column_count;
+          const auto lend = l + lhs.m_col_count;
           for (; ll != lend; ++p, ++r, ++ll) {
             std::construct_at(p, *ll + *r);
           }
@@ -820,7 +820,7 @@ private:
               l += m_stride, r += rhs.m_stride, ++i) {
           auto rr = r;
           auto ll = l;
-          const auto le = l + lhs.m_column_count;
+          const auto le = l + lhs.m_col_count;
           for (; ll != le; ++p, ++rr, ++ll) {
             std::construct_at(p, *ll + *rr);
           }
@@ -839,11 +839,11 @@ private:
       [[maybe_unused]] subtraction_tag tag,
       const xqs_matrix& lhs,
       const xqs_matrix& rhs) :
-    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_column_count)),
+    m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(lhs.m_row_count),
-    m_column_count(lhs.m_column_count),
-    m_stride(lhs.m_column_count),
+    m_col_count(lhs.m_col_count),
+    m_stride(lhs.m_col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -851,26 +851,26 @@ private:
     auto l = lhs.m_data;
     auto r = rhs.m_data;
     if constexpr (std::is_trivial_v<T>) {
-      if (lhs.m_stride == lhs.m_column_count) {
+      if (lhs.m_stride == lhs.m_col_count) {
         const auto le = l + lhs.m_row_count * lhs.m_stride;
-        if (rhs.m_stride == rhs.m_column_count) {
+        if (rhs.m_stride == rhs.m_col_count) {
           for (; l != le; ++p, ++r, ++l) {
             *p = *l - *r;
           }
         } else {
           for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            const auto e = r + rhs.m_column_count;
+            const auto e = r + rhs.m_col_count;
             for (; rr != e; ++p, ++l, ++rr) {
               *p = *l - *rr;
             }
           }
         }
-      } else if (rhs.m_stride == rhs.m_column_count) {
+      } else if (rhs.m_stride == rhs.m_col_count) {
         const auto re = r + rhs.m_row_count * rhs.m_stride;
         for (; r != re; l += m_stride) {
           auto ll = l;
-          const auto lend = l + lhs.m_column_count;
+          const auto lend = l + lhs.m_col_count;
           for (; ll != lend; ++p, ++r, ++ll) {
             *p = *ll - *r;
           }
@@ -880,7 +880,7 @@ private:
              l += m_stride, r += rhs.m_stride, ++i) {
           auto rr = r;
           auto ll = l;
-          const auto le = l + lhs.m_column_count;
+          const auto le = l + lhs.m_col_count;
           for (; ll != le; ++p, ++rr, ++ll) {
             *p = *ll - *rr;
           }
@@ -890,26 +890,26 @@ private:
     }
 
     try {
-      if (lhs.m_stride == lhs.m_column_count) {
+      if (lhs.m_stride == lhs.m_col_count) {
         const auto le = l + lhs.m_row_count * lhs.m_stride;
-        if (rhs.m_stride == rhs.m_column_count) {
+        if (rhs.m_stride == rhs.m_col_count) {
           for (; l != le; ++p, ++r, ++l) {
             std::construct_at(p, *l - *r);
           }
         } else {
           for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            const auto e = r + rhs.m_column_count;
+            const auto e = r + rhs.m_col_count;
             for (; rr != e; ++p, ++l, ++rr) {
               std::construct_at(p, *l - *rr);
             }
           }
         }
-      } else if (rhs.m_stride == rhs.m_column_count) {
+      } else if (rhs.m_stride == rhs.m_col_count) {
         const auto re = r + rhs.m_row_count * rhs.m_stride;
         for (; r != re; l += m_stride) {
           auto ll = l;
-          const auto le = l + lhs.m_column_count;
+          const auto le = l + lhs.m_col_count;
           for (; ll != le; ++p, ++r, ++ll) {
             std::construct_at(p, *ll - *r);
           }
@@ -919,7 +919,7 @@ private:
               l += m_stride, r += rhs.m_stride, ++i) {
           auto rr = r;
           auto ll = l;
-          const auto le = l + lhs.m_column_count;
+          const auto le = l + lhs.m_col_count;
           for (; ll != le; ++p, ++rr, ++ll) {
             std::construct_at(p, *ll - *rr);
           }
@@ -938,11 +938,11 @@ private:
       [[maybe_unused]] multiplication_tag tag,
       const xqs_matrix& lhs,
       const xqs_matrix& rhs) :
-    m_capacity(validate_dimensions(lhs.m_row_count, rhs.m_column_count)),
+    m_capacity(validate_dimensions(lhs.m_row_count, rhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(lhs.m_row_count),
-    m_column_count(rhs.m_column_count),
-    m_stride(rhs.m_column_count),
+    m_col_count(rhs.m_col_count),
+    m_stride(rhs.m_col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -952,12 +952,12 @@ private:
     try {
       auto l = lhs.m_data;
       const auto e = l + lhs.size();
-      for (; l != e; l += lhs.m_column_count) {
+      for (; l != e; l += lhs.m_col_count) {
         auto rr = rhs.m_data;
-        auto const re = rr + rhs.m_column_count;
+        auto const re = rr + rhs.m_col_count;
         for (; rr != re; ++rr, ++p) {
           auto ll = l;
-          auto const le = l + lhs.m_column_count;
+          auto const le = l + lhs.m_col_count;
           auto r = rr;
           T v{};
           for (; ll != le; ++ll, r += rhs.m_stride) {
@@ -978,10 +978,10 @@ private:
   xqs_matrix(
       [[maybe_unused]] transpose_copy_tag tag,
       const xqs_matrix& src) :
-    m_capacity(validate_dimensions(src.m_column_count, src.m_row_count)),
+    m_capacity(validate_dimensions(src.m_col_count, src.m_row_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
-    m_row_count(src.m_column_count),
-    m_column_count(src.m_row_count),
+    m_row_count(src.m_col_count),
+    m_col_count(src.m_row_count),
     m_stride(src.m_row_count),
     m_is_owner(true)
   {
@@ -990,7 +990,7 @@ private:
     try {
       auto const e = m_data + size();
       auto s = src.m_data;
-      const auto se = src.m_data + src.m_column_count;
+      const auto se = src.m_data + src.m_col_count;
       for (; s != se; ++s) {
         auto ss = s;
         for (; p != e; ++p, ss += src.m_stride) {
@@ -1009,10 +1009,10 @@ private:
   xqs_matrix(
       [[maybe_unused]] transpose_move_tag tag,
       xqs_matrix&& src) :
-    m_capacity(validate_dimensions(src.m_column_count, src.m_row_count)),
+    m_capacity(validate_dimensions(src.m_col_count, src.m_row_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
-    m_row_count(src.m_column_count),
-    m_column_count(src.m_row_count),
+    m_row_count(src.m_col_count),
+    m_col_count(src.m_row_count),
     m_stride(src.m_row_count),
     m_is_owner(true)
   {
@@ -1021,7 +1021,7 @@ private:
     try {
       auto const e = m_data + size();
       auto s = src.m_data;
-      const auto se = src.m_data + src.m_column_count;
+      const auto se = src.m_data + src.m_col_count;
       for (; s != se; ++s) {
         auto ss = s;
         for (; p != e; ++p, ss += src.m_stride) {
@@ -1040,10 +1040,10 @@ private:
   xqs_matrix(
       [[maybe_unused]] diag_to_hvec_tag tag,
       const xqs_matrix& src) :
-    m_capacity(validate_dimensions(src.m_column_count, 1)),
+    m_capacity(validate_dimensions(src.m_col_count, 1)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(src.m_row_count),
-    m_column_count(1),
+    m_col_count(1),
     m_stride(1),
     m_is_owner(true)
   {
@@ -1068,11 +1068,11 @@ private:
   xqs_matrix(
       [[maybe_unused]] diag_to_vvec_tag tag,
       const xqs_matrix& src) :
-    m_capacity(validate_dimensions(1, src.m_column_count)),
+    m_capacity(validate_dimensions(1, src.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(1),
-    m_column_count(src.m_column_count),
-    m_stride(src.m_column_count),
+    m_col_count(src.m_col_count),
+    m_stride(src.m_col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -1102,7 +1102,7 @@ private:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -1143,7 +1143,7 @@ private:
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_column_count(column_count),
+    m_col_count(column_count),
     m_stride(column_count),
     m_is_owner(true)
   {
@@ -1220,7 +1220,7 @@ public:
     std::swap(m_capacity, other.m_capacity);
     std::swap(m_data, other.m_data);
     std::swap(m_row_count, other.m_row_count);
-    std::swap(m_column_count, other.m_column_count);
+    std::swap(m_col_count, other.m_col_count);
     std::swap(m_stride, other.m_stride);
     std::swap(m_is_owner, other.m_is_owner);
   }
@@ -1252,26 +1252,26 @@ public:
     if (!empty()) [[likely]] {
       auto l = m_data;
       auto r = rhs.m_data;
-      if (m_stride == m_column_count) {
+      if (m_stride == m_col_count) {
         const auto le = l + m_row_count * m_stride;
-        if (rhs.m_stride == rhs.m_column_count) {
+        if (rhs.m_stride == rhs.m_col_count) {
           for (; l != le; ++r, ++l) {
             *l += *r;
           }
         } else {
           for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            const auto re = r + rhs.m_column_count;
+            const auto re = r + rhs.m_col_count;
             for (; rr != re; ++l, ++rr) {
               *l += *rr;
             }
           }
         }
-      } else if (rhs.m_stride == rhs.m_column_count) {
+      } else if (rhs.m_stride == rhs.m_col_count) {
         const auto re = r + rhs.m_row_count * rhs.m_stride;
         for (; r != re; l += m_stride) {
           auto ll = l;
-          const auto le = l + rhs.m_column_count;
+          const auto le = l + rhs.m_col_count;
           for (; ll != le; ++r, ++ll) {
             *ll += *r;
           }
@@ -1281,7 +1281,7 @@ public:
              l += m_stride, r += rhs.m_stride, ++i) {
           auto rr = r;
           auto ll = l;
-          const auto le = l + rhs.m_column_count;
+          const auto le = l + rhs.m_col_count;
           for (; ll != le; ++rr, ++ll) {
             *ll += *rr;
           }
@@ -1297,26 +1297,26 @@ public:
     if (!empty()) [[likely]] {
       auto l = m_data;
       auto r = rhs.m_data;
-      if (m_stride == m_column_count) {
+      if (m_stride == m_col_count) {
         const auto le = l + m_row_count * m_stride;
-        if (rhs.m_stride == rhs.m_column_count) {
+        if (rhs.m_stride == rhs.m_col_count) {
           for (; l != le; ++r, ++l) {
             *l -= *r;
           }
         } else {
           for (; l != le; r += rhs.m_stride) {
             auto rr = r;
-            const auto re = r + rhs.m_column_count;
+            const auto re = r + rhs.m_col_count;
             for (; rr != re; ++l, ++rr) {
               *l -= *rr;
             }
           }
         }
-      } else if (rhs.m_stride == rhs.m_column_count) {
+      } else if (rhs.m_stride == rhs.m_col_count) {
         const auto re = r + rhs.m_row_count * rhs.m_stride;
         for (; r != re; l += m_stride) {
           auto ll = l;
-          const auto le = l + rhs.m_column_count;
+          const auto le = l + rhs.m_col_count;
           for (; ll != le; ++r, ++ll) {
             *ll -= *r;
           }
@@ -1326,7 +1326,7 @@ public:
              l += m_stride, r += rhs.m_stride, ++i) {
           auto rr = r;
           auto ll = l;
-          const auto le = l + rhs.m_column_count;
+          const auto le = l + rhs.m_col_count;
           for (; ll != le; ++rr, ++ll) {
             *ll -= *rr;
           }
@@ -1552,7 +1552,7 @@ public:
   {
     if (!empty()) [[likely]] {
       auto p = m_data;
-      if (rhs.m_stride == rhs.m_column_count) {
+      if (rhs.m_stride == rhs.m_col_count) {
         const auto e = p + size();
         for (; p != e; ++p) {
           (*p) *= rhs;
@@ -1560,7 +1560,7 @@ public:
       } else {
         for (std::size_t i = 0; i < m_row_count; p += rhs.m_stride, ++i) {
           auto pp = p;
-          const auto e = p + rhs.m_column_count;
+          const auto e = p + rhs.m_col_count;
           for (; pp != e; ++pp) {
             (*pp) *= *rhs;
           }
@@ -1575,7 +1575,7 @@ public:
   {
     if (!empty()) [[likely]] {
       auto p = m_data;
-      if (rhs.m_stride == rhs.m_column_count) {
+      if (rhs.m_stride == rhs.m_col_count) {
         const auto e = p + size();
         for (; p != e; ++p) {
           (*p) /= rhs;
@@ -1583,7 +1583,7 @@ public:
       } else {
         for (std::size_t i = 0; i < m_row_count; p += rhs.m_stride, ++i) {
           auto pp = p;
-          const auto e = p + rhs.m_column_count;
+          const auto e = p + rhs.m_col_count;
           for (; pp != e; ++pp) {
             (*pp) /= *rhs;
           }
@@ -1608,7 +1608,7 @@ public:
     const T zero{};
     const auto p0e = m_data + m_row_count * m_stride;
     for (auto p0 = m_data; p0 != p0e; p0 += m_stride) {
-      const auto pe = p0 + m_column_count;
+      const auto pe = p0 + m_col_count;
       for (pointer p = p0; p != pe; ++p) {
         if (std::fabs(*p) < threshold) {
           *p = zero;
@@ -1621,24 +1621,24 @@ public:
 
   xqs_matrix operator[](const size_type i) noexcept
   {
-    return xqs_matrix(m_data + i * m_stride, 1, m_column_count, m_stride);
+    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
   const xqs_matrix operator[](const size_type i) const noexcept
   {
-    return xqs_matrix(m_data + i * m_stride, 1, m_column_count, m_stride);
+    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
   xqs_matrix row_at(const size_type i)
   {
     validate_row_index(i);
-    return xqs_matrix(m_data + i * m_stride, 1, m_column_count, m_stride);
+    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
   const xqs_matrix row_at(const size_type i) const
   {
     validate_row_index(i);
-    return xqs_matrix(m_data + i * m_stride, 1, m_column_count, m_stride);
+    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
   // Access individual columns
@@ -1739,12 +1739,12 @@ public:
 
   size_type column_count() const noexcept
   {
-    return m_column_count;
+    return m_col_count;
   }
 
   size_type size() const noexcept
   {
-    return m_row_count * m_column_count;
+    return m_row_count * m_col_count;
   }
 
   static constexpr size_type max_size() noexcept
@@ -1754,7 +1754,7 @@ public:
 
   bool empty() const noexcept
   {
-    return m_row_count == 0 || m_column_count == 0;
+    return m_row_count == 0 || m_col_count == 0;
   }
 
   size_type stride() const noexcept
@@ -1795,7 +1795,7 @@ public:
 
   void resize_rows(const size_type new_rows)
   {
-    resize(new_rows, m_column_count);
+    resize(new_rows, m_col_count);
   }
 
   void resize_columns(const size_type new_cols)
@@ -1830,7 +1830,7 @@ public:
           // Copy existing data
           if (m_data != nullptr) {
             const auto min_rows = std::min(m_row_count, new_rows);
-            const auto min_cols = std::min(m_column_count, new_cols);
+            const auto min_cols = std::min(m_col_count, new_cols);
             for (size_type r = 0; r < min_rows; ++r) {
               std::copy_n(
                 m_data + r * m_stride,
@@ -1861,11 +1861,11 @@ public:
 
       m_data = new_data;
       m_capacity = new_capacity;
-    } else if (new_cols != m_column_count) {
+    } else if (new_cols != m_col_count) {
       // Adjust existing data to the new column count
       const auto min_rows = std::min(m_row_count, new_rows);
-      const auto min_cols = std::min(m_column_count, new_cols);
-      if (new_cols < m_column_count) {
+      const auto min_cols = std::min(m_col_count, new_cols);
+      if (new_cols < m_col_count) {
         auto ps = m_data;
         const auto pse = m_data + min_rows * m_stride;
         auto pd = m_data;
@@ -1884,7 +1884,7 @@ public:
     }
 
     m_row_count = new_rows;
-    m_column_count = new_cols;
+    m_col_count = new_cols;
     m_stride = new_cols;
   }
 
@@ -1960,7 +1960,7 @@ public:
       }
     }
     m_row_count = 0;
-    m_column_count = 0;
+    m_col_count = 0;
   }
 
   void shrink_to_fit()
@@ -1970,7 +1970,7 @@ public:
         "xqs_matrix: can't shrink to fit in a non-owning matrix");
     }
 
-    const size_type new_capacity = m_row_count * m_column_count;
+    const size_type new_capacity = m_row_count * m_col_count;
 
     if (new_capacity < m_capacity) {
       auto new_data = new_capacity != 0
@@ -2027,7 +2027,7 @@ public:
     if (!empty()) {
       auto src = m_data;
       for (size_type r = 0; r < m_row_count; src += m_stride, ++r) {
-        std::copy_n(src, m_column_count, dest);
+        std::copy_n(src, m_col_count, dest);
       }
     }
     return dest;
@@ -2041,9 +2041,9 @@ public:
       for (size_type r = 0; r < m_row_count; s += m_stride, ++r) {
         // Unfortunately, there is no std::move_n()
         if constexpr (std::is_trivially_copyable_v<T>) {
-          dest = std::copy_n(s, m_column_count, dest);
+          dest = std::copy_n(s, m_col_count, dest);
         } else {
-          const auto se = s + m_column_count;
+          const auto se = s + m_col_count;
           for (; s != se; ++s, ++dest) {
             *dest = std::move(*s);
           }
@@ -2128,33 +2128,33 @@ private:
   void check_equal_dimensions(const xqs_matrix<T>& other) const
   {
     if (m_row_count == other.m_row_count &&
-        m_column_count == other.m_column_count) [[likely]] return;
+        m_col_count == other.m_col_count) [[likely]] return;
     std::ostringstream err;
     err << "xqs_matrix: dimensions of the other matrix differ "
-        << m_row_count << '*' << m_column_count << " vs "
-        << other.m_row_count << '*' << other.m_column_count << ')';
+        << m_row_count << '*' << m_col_count << " vs "
+        << other.m_row_count << '*' << other.m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
 
   // Check that matrix has dimensions that are suitable for product oeration
   void check_suitable_for_product(const xqs_matrix<T>& other) const
   {
-    if (m_column_count == other.m_row_count) [[likely]] return;
+    if (m_col_count == other.m_row_count) [[likely]] return;
     std::ostringstream err;
     err << "xqs_matrix: dimensions of the other matrix are not suitable"
             " for the product [this * other] ("
-        << m_row_count << '*' << m_column_count << " vs "
-        << other.m_row_count << '*' << other.m_column_count << ')';
+        << m_row_count << '*' << m_col_count << " vs "
+        << other.m_row_count << '*' << other.m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
 
   // Check that matrix is square
   void check_is_square() const
   {
-    if (m_row_count == m_column_count) [[unlikely]] return;
+    if (m_row_count == m_col_count) [[unlikely]] return;
     std::ostringstream err;
     err << "xqs_matrix: matrix is not square ("
-        << m_row_count << '*' << m_column_count << ')';
+        << m_row_count << '*' << m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
 
@@ -2171,10 +2171,10 @@ private:
   // Validate column index
   void validate_column_index(std::size_t col) const
   {
-    if (col < m_column_count) [[likely]] return;
+    if (col < m_col_count) [[likely]] return;
     std::ostringstream err;
     err << "xqs_matrix: column index " << col << " is out of range ("
-        << m_column_count << ')';
+        << m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
 
@@ -2197,12 +2197,12 @@ private:
     m_capacity = rhs.m_capacity;
     m_data = rhs.m_data;
     m_row_count = rhs.m_row_count;
-    m_column_count = rhs.m_column_count;
+    m_col_count = rhs.m_col_count;
     m_stride = rhs.m_stride;
     m_is_owner = rhs.m_is_owner;
 
     rhs.m_data = nullptr;
-    rhs.m_capacity = rhs.m_row_count = rhs.m_column_count = rhs.m_stride = 0;
+    rhs.m_capacity = rhs.m_row_count = rhs.m_col_count = rhs.m_stride = 0;
     rhs.m_is_owner = true;
   }
 
@@ -2223,7 +2223,7 @@ private:
       auto r = m_data;
       for (; pc != pce; ++pc, r += m_stride) {
         auto p = r;
-        const auto e = r + m_column_count;
+        const auto e = r + m_col_count;
         std::construct_at(pc);
         for (; p != e; ++p) {
           auto c0 = std::abs(*p);
@@ -2295,7 +2295,7 @@ private:
   size_type m_capacity;
   pointer m_data;
   size_type m_row_count;
-  size_type m_column_count;
+  size_type m_col_count;
   size_type m_stride;
   bool m_is_owner;
 };
@@ -2427,11 +2427,11 @@ xqs_matrix<T, Alloc> read_csv(
     ++row_count;
     auto row = parse_vector(line, conv, field_delims);
     if (row.empty()) throw std::runtime_error("read_csv: empty data line");
-    if (result.m_column_count != row.size()) {
-      if (result.m_column_count < row.size()) {
+    if (result.m_col_count != row.size()) {
+      if (result.m_col_count < row.size()) {
         result.column_count(row.size());
       } else {
-        row.resize(result.m_column_count);
+        row.resize(result.m_col_count);
       }
     }
     result.m_data.push_back(std::move(row));
