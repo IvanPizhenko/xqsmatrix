@@ -2377,14 +2377,6 @@ std::basic_istream<Ch, Traits>& operator>>(
   return is;
 }
 
-namespace detail {
-
-void split()
-{
-
-}
-
-} // namespace detail
 
 template <
     typename T,
