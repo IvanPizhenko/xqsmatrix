@@ -2348,6 +2348,7 @@ std::basic_ostream<Ch, Traits>& operator<<(
   return os;
 }
 
+
 template<class T, class Alloc, class Ch, class Traits>
 std::basic_istream<Ch, Traits>& operator>>(
   std::basic_istream<Ch, Traits>& is,
