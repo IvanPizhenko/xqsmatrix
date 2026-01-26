@@ -2308,6 +2308,7 @@ inline void swap(xqs_matrix<T, Alloc>& a, xqs_matrix<T, Alloc>& b) noexcept
   a.swap(b);
 }
 
+
 template<class T, class Alloc, class Ch, class Traits>
 std::basic_ostream<Ch, Traits>& operator<<(
   std::basic_ostream<Ch, Traits>& os,
