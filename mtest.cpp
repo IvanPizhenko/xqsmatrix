@@ -27,7 +27,7 @@ int main()
 {
   std::mt19937 rng(111);
   std::uniform_real_distribution<double> d(0, 1.0);
-  
+
   constexpr std::size_t N = 10;
   xqs_matrix<double> m(N, N);
   for (std::size_t i = 0; i < N; ++i) {
@@ -36,16 +36,16 @@ int main()
     }
   }
 
-  constexpr double t = 1e-9;
+  constexpr double kThreshold = 1e-9;
 
   const auto mm1 = inverse_v1(m);
   auto pr1 = m * mm1;
-  pr1.fix_to_zero(t);
+  pr1.fix_to_zero(kThreshold);
   std::cout << pr1 << std::endl << std::endl;
 
   const auto mm2 = inverse_v2(m);
   auto pr2 = m * mm2;
-  pr2.fix_to_zero(t);
+  pr2.fix_to_zero(kThreshold);
   std::cout << pr2 << std::endl << std::endl;
 
   const auto mm3 = m + m;
