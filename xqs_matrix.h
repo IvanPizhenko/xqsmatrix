@@ -48,7 +48,7 @@
 #include <type_traits>
 #include <vector>
 
-/// @brief Matrix class.
+/// @brief 2D matrix.
 /// @tparam T Element type.
 /// @tparam Alloc Allocator type.
 template <typename T, class Alloc = std::allocator<T>>
