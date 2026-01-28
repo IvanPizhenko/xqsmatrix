@@ -1082,7 +1082,7 @@ private:
     try {
       const auto s = src.m_data;
       const auto step = src.m_stride + 1;
-      const auto e = p + row_count;
+      const auto e = p + m_row_count;
       for (; p != e; ++p, s += step) {
         std::construct_at(p, *s);
       }
