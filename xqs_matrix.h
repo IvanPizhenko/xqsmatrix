@@ -2413,7 +2413,11 @@ xqs_matrix<T, Alloc> read_csv(
     if (!in) throw std::runtime_error("read_csv: can't read file header");
     col_count = std::count_if(
       line.cbegin(), line.cend(),
-      [&field_delims](const auto c) noexcept { return field_delims.contains(c); }
+      [&field_delims](const auto c) noexcept
+      {
+         return field_delims.find(c) !=
+                std::basic_string_view<Ch, Traits>::npos;
+      }
     ) + 1;
   }
 
