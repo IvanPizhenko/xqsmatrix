@@ -341,6 +341,7 @@ public:
     }
   }
 
+#if __cplusplus >= 202302L
   template <typename Range>
   xqs_matrix(
       [[maybe_unused]] std::from_range_t tag,
@@ -393,8 +394,9 @@ public:
       throw;
     }
   }
+#endif
 
-  xqs_matrix(const xqs_matrix& src) :
+xqs_matrix(const xqs_matrix& src) :
     m_capacity(src.size()),
     m_data(src.m_is_owner
       ? (m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr)
@@ -1052,7 +1054,7 @@ private:
     try {
       auto s = src.m_data;
       const auto step = src.m_stride + 1;
-      const auto e = p + row_count;
+      const auto e = p + m_row_count;
       for (; p != e; ++p, s += step) {
         std::construct_at(p, *s);
       }
@@ -2394,7 +2396,7 @@ xqs_matrix<T, Alloc> read_csv(
   const Converter& conv,
   const bool has_header_line = true)
 {
-  xqs_matrix<U, Alloc> result;
+  xqs_matrix<T, Alloc> result;
 
   // Open input file
   std::basic_ifstream<Ch, Traits> in(path.c_str());
