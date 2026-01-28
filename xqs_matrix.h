@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// This is implementation of a 2D matrix class in C++,
-// inspired by some ideas described in the following articles:
+// This is implementation of the 2D matrix in C++,
+// inspired by ideas described in the following articles:
 //
 // https://www.quantstart.com/articles/Matrix-Classes-in-C-The-Header-File
 // https://www.quantstart.com/articles/Matrix-Classes-in-C-The-Source-File
