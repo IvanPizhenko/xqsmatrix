@@ -27,12 +27,12 @@
 // OR OTHER DEALINGS IN THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef XQS_MATRIX_H__
-#define XQS_MATRIX_H__
-
 #ifndef XQS_MATRIX_NO_PRAGMA_ONCE
 #pragma once
 #endif
+
+#ifndef XQS_MATRIX_H__
+#define XQS_MATRIX_H__
 
 // CRT
 #include <cmath>
