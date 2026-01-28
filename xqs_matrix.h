@@ -206,9 +206,7 @@ public:
       }
       if (p != e) {
         const T a{};
-        for (; p != e; ++p) {
-          *p = a;
-        }
+        std::uninitialized_fill(p, e, a);
       }
       return;
     }
