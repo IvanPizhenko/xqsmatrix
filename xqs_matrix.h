@@ -227,7 +227,7 @@ public:
     }
   }
 
-#if __cplusplus >= 202302L
+#if __cplusplus > 202002L // C++23
   template <typename Range>
   xqs_matrix(
       [[maybe_unused]] std::from_range_t tag,
