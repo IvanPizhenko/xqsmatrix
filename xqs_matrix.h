@@ -48,6 +48,8 @@
 #include <type_traits>
 #include <vector>
 
+namespace stdx {
+
 /// @brief 2D matrix.
 /// @tparam T Element type.
 /// @tparam Alloc Allocator type.
@@ -2327,5 +2329,7 @@ xqs_matrix<T, Alloc> read_csv(
 
   return result;
 }
+
+} // namespace stdx
 
 #endif // XQS_MATRIX_H__
