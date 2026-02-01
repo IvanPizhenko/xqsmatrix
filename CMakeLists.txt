@@ -1,10 +1,4 @@
 ###############################################################################
-# This is implementation of the 2D matrix in C++,
-# inspired by ideas described in the following articles:
-#
-# https:##www.quantstart.com/articles/Matrix-Classes-in-C-The-Header-File
-# https:##www.quantstart.com/articles/Matrix-Classes-in-C-The-Source-File
-#
 # Copyright (c) 2026 Ivan Pizhenko. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
