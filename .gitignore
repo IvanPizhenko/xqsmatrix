@@ -34,3 +34,9 @@
 # Build outputs
 mtest
 mtest.exe
+
+# CMake
+build/
+build-*/
+cmake-build/
+cmake-build-*/
