@@ -27,12 +27,12 @@
 // THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef XQS_MATRIX_NO_PRAGMA_ONCE
+#ifndef matrix_NO_PRAGMA_ONCE
 #pragma once
 #endif
 
-#ifndef XQS_MATRIX_H__
-#define XQS_MATRIX_H__
+#ifndef matrix_H__
+#define matrix_H__
 
 // CRT
 #include <cmath>
@@ -54,7 +54,7 @@ namespace stdx {
 /// @tparam T Element type.
 /// @tparam Alloc Allocator type.
 template <typename T, class Alloc = std::allocator<T>>
-class xqs_matrix {
+class matrix {
 public:
 
   // Types
@@ -95,7 +95,7 @@ public:
 
   // Public Constructors
 
-  xqs_matrix() noexcept(std::is_nothrow_default_constructible_v<Alloc>) :
+  matrix() noexcept(std::is_nothrow_default_constructible_v<Alloc>) :
     m_capacity(0),
     m_data(nullptr),
     m_row_count(0),
@@ -105,7 +105,7 @@ public:
   {
   }
 
-  xqs_matrix(const Alloc& alloc) noexcept(
+  matrix(const Alloc& alloc) noexcept(
       std::is_nothrow_copy_constructible_v<Alloc>) :
     m_allocator(alloc),
     m_capacity(0),
@@ -117,7 +117,7 @@ public:
   {
   }
 
-  explicit xqs_matrix(const size_type row_count, const size_type column_count) :
+  explicit matrix(const size_type row_count, const size_type column_count) :
     m_capacity(validate_dimensions(row_count, column_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
@@ -147,7 +147,7 @@ public:
     }
   }
 
-  xqs_matrix(
+  matrix(
       const size_type row_count,
       const size_type column_count,
       const_reference v,
@@ -183,7 +183,7 @@ public:
   }
 
   template <typename InputIt>
-  xqs_matrix(
+  matrix(
       InputIt first,
       InputIt last,
       const size_type row_count,
@@ -231,7 +231,7 @@ public:
 
 #if __cplusplus > 202002L // C++23
   template <typename Range>
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] std::from_range_t tag,
       Range&& r,
       const size_type row_count,
@@ -284,7 +284,7 @@ public:
   }
 #endif
 
-xqs_matrix(const xqs_matrix& src) :
+matrix(const matrix& src) :
     m_capacity(src.size()),
     m_data(src.m_is_owner
       ? (m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr)
@@ -316,7 +316,7 @@ xqs_matrix(const xqs_matrix& src) :
     }
   }
 
-  xqs_matrix(const xqs_matrix& src, const Alloc& allocator) :
+  matrix(const matrix& src, const Alloc& allocator) :
     m_allocator(allocator),
     m_capacity(src.size()),
     m_data(src.m_is_owner
@@ -349,7 +349,7 @@ xqs_matrix(const xqs_matrix& src) :
     }
   }
 
-  xqs_matrix(xqs_matrix&& src)
+  matrix(matrix&& src)
       noexcept(std::is_nothrow_move_constructible_v<Alloc>) :
     m_allocator(std::move(src.m_allocator)),
     m_capacity(src.m_capacity),
@@ -364,7 +364,7 @@ xqs_matrix(const xqs_matrix& src) :
     src.m_is_owner = true;
   }
 
-  xqs_matrix(xqs_matrix&& src, const Alloc& allocator) noexcept(
+  matrix(matrix&& src, const Alloc& allocator) noexcept(
       std::is_nothrow_copy_constructible_v<Alloc>) :
     m_allocator(allocator),
     m_capacity(src.m_capacity),
@@ -379,7 +379,7 @@ xqs_matrix(const xqs_matrix& src) :
     src.m_is_owner = true;
   }
 
-  xqs_matrix(
+  matrix(
       T* const data,
       const size_type row_count,
       const size_type column_count,
@@ -393,7 +393,7 @@ xqs_matrix(const xqs_matrix& src) :
   {
   }
 
-  xqs_matrix(
+  matrix(
       std::initializer_list<T> init,
       const size_type row_count,
       const size_type column_count,
@@ -444,7 +444,7 @@ private:
 
 // Private constructors
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] identity_matrix_tag tag,
       const size_type dimension,
       const_reference value) :
@@ -501,7 +501,7 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] transposed_identity_matrix_tag tag,
       const size_type dimension,
       const_reference value) :
@@ -568,9 +568,9 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] mult_by_scalar_tag tag,
-      const xqs_matrix& lhs,
+      const matrix& lhs,
       const_reference rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
@@ -596,9 +596,9 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] div_by_scalar_tag tag,
-      const xqs_matrix& lhs,
+      const matrix& lhs,
       const_reference rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
@@ -624,10 +624,10 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] addition_tag tag,
-      const xqs_matrix& lhs,
-      const xqs_matrix& rhs) :
+      const matrix& lhs,
+      const matrix& rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(lhs.m_row_count),
@@ -725,10 +725,10 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] subtraction_tag tag,
-      const xqs_matrix& lhs,
-      const xqs_matrix& rhs) :
+      const matrix& lhs,
+      const matrix& rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, lhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(lhs.m_row_count),
@@ -824,10 +824,10 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] multiplication_tag tag,
-      const xqs_matrix& lhs,
-      const xqs_matrix& rhs) :
+      const matrix& lhs,
+      const matrix& rhs) :
     m_capacity(validate_dimensions(lhs.m_row_count, rhs.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(lhs.m_row_count),
@@ -865,9 +865,9 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] transpose_copy_tag tag,
-      const xqs_matrix& src) :
+      const matrix& src) :
     m_capacity(validate_dimensions(src.m_col_count, src.m_row_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(src.m_col_count),
@@ -896,9 +896,9 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] transpose_move_tag tag,
-      xqs_matrix&& src) :
+      matrix&& src) :
     m_capacity(validate_dimensions(src.m_col_count, src.m_row_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(src.m_col_count),
@@ -927,9 +927,9 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] diag_to_hvec_tag tag,
-      const xqs_matrix& src) :
+      const matrix& src) :
     m_capacity(validate_dimensions(src.m_col_count, 1)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(src.m_row_count),
@@ -955,9 +955,9 @@ private:
     }
   }
 
-  xqs_matrix(
+  matrix(
       [[maybe_unused]] diag_to_vvec_tag tag,
-      const xqs_matrix& src) :
+      const matrix& src) :
     m_capacity(validate_dimensions(1, src.m_col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(1),
@@ -983,8 +983,8 @@ private:
     }
   }
 
-  xqs_matrix([[maybe_unused]] window_copy_tag tag,
-      const xqs_matrix& src,
+  matrix([[maybe_unused]] window_copy_tag tag,
+      const matrix& src,
       const size_type row_offset,
       const size_type column_offset,
       const size_type row_count,
@@ -1024,8 +1024,8 @@ private:
     }
   }
 
-  xqs_matrix([[maybe_unused]] window_move_tag tag,
-      const xqs_matrix& src,
+  matrix([[maybe_unused]] window_move_tag tag,
+      const matrix& src,
       const size_type row_offset,
       const size_type column_offset,
       const size_type row_count,
@@ -1071,7 +1071,7 @@ public:
 
   // Destructor
 
-  ~xqs_matrix()
+  ~matrix()
   {
     if (m_is_owner && m_data != nullptr) [[likely]] {
       if constexpr (!std::is_trivial_v<T>) {
@@ -1088,23 +1088,23 @@ public:
 
   // Identity matrices
 
-  static xqs_matrix identity(
+  static matrix identity(
       const size_type dimension,
       const_reference value = T(1))
   {
-    return xqs_matrix(identity_matrix_tag{}, dimension, value);
+    return matrix(identity_matrix_tag{}, dimension, value);
   }
 
-  static xqs_matrix transposed_identity(
+  static matrix transposed_identity(
       const size_type dimension,
       const_reference value = T(1))
   {
-    return xqs_matrix(transposed_identity_matrix_tag{}, dimension, value);
+    return matrix(transposed_identity_matrix_tag{}, dimension, value);
   }
 
   // Helper functions
 
-  void swap(xqs_matrix& other) noexcept
+  void swap(matrix& other) noexcept
   {
     // m_allocator.swap(other.m_allocator);
     std::swap(m_capacity, other.m_capacity);
@@ -1117,16 +1117,16 @@ public:
 
   // Assignment operators
 
-  xqs_matrix& operator=(const xqs_matrix& rhs)
+  matrix& operator=(const matrix& rhs)
   {
     if (&rhs != this) [[likely]] {
-      xqs_matrix tmp{rhs};
+      matrix tmp{rhs};
       do_move_assign(std::move(tmp));
     }
     return *this;
   }
 
-  xqs_matrix& operator=(xqs_matrix&& rhs) noexcept
+  matrix& operator=(matrix&& rhs) noexcept
   {
     if (&rhs != this) [[likely]] {
       do_move_assign(std::move(rhs));
@@ -1136,7 +1136,7 @@ public:
 
   // Math operations
 
-  xqs_matrix& operator+=(const xqs_matrix& rhs)
+  matrix& operator+=(const matrix& rhs)
   {
     check_equal_dimensions(rhs);
     if (!empty()) [[likely]] {
@@ -1181,7 +1181,7 @@ public:
     return *this;
   }
 
-  xqs_matrix& operator-=(const xqs_matrix& rhs)
+  matrix& operator-=(const matrix& rhs)
   {
     check_equal_dimensions(rhs);
     if (!empty()) [[likely]] {
@@ -1226,73 +1226,73 @@ public:
     return *this;
   }
 
-  xqs_matrix& operator*=(const xqs_matrix& rhs)
+  matrix& operator*=(const matrix& rhs)
   {
     *this = (*this) * rhs;
     return *this;
   }
 
   template <typename U, typename A>
-  friend xqs_matrix<U, A> operator+(
-      const xqs_matrix<U, A>& lhs,
-      const xqs_matrix<U, A>& rhs)
+  friend matrix<U, A> operator+(
+      const matrix<U, A>& lhs,
+      const matrix<U, A>& rhs)
   {
     lhs.check_equal_dimensions(rhs);
-    return xqs_matrix(xqs_matrix::addition_tag{}, lhs, rhs);
+    return matrix(matrix::addition_tag{}, lhs, rhs);
   }
 
   template <typename U, typename A>
-  friend xqs_matrix<U, A> operator-(
-      const xqs_matrix<U, A>& lhs,
-      const xqs_matrix<U, A>& rhs)
+  friend matrix<U, A> operator-(
+      const matrix<U, A>& lhs,
+      const matrix<U, A>& rhs)
   {
     lhs.check_equal_dimensions(rhs);
-    return xqs_matrix(xqs_matrix::subtraction_tag{}, lhs, rhs);
+    return matrix(matrix::subtraction_tag{}, lhs, rhs);
   }
 
   template <typename U, typename A>
-  friend xqs_matrix<U, A> operator*(
-    const xqs_matrix<U, A>& lhs,
-    const xqs_matrix<U, A>& rhs)
+  friend matrix<U, A> operator*(
+    const matrix<U, A>& lhs,
+    const matrix<U, A>& rhs)
   {
     lhs.check_suitable_for_product(rhs);
-    return {xqs_matrix::multiplication_tag{}, lhs, rhs};
+    return {matrix::multiplication_tag{}, lhs, rhs};
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> diag_to_hvec(const xqs_matrix<U, A>& m)
+  friend matrix<U, A> diag_to_hvec(const matrix<U, A>& m)
   {
     m.check_is_square(m);
-    return xqs_matrix<U, A>(xqs_matrix::diag_to_hvec_tag{}, m);
+    return matrix<U, A>(matrix::diag_to_hvec_tag{}, m);
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> diag_to_vvec(const xqs_matrix<U, A>& m)
+  friend matrix<U, A> diag_to_vvec(const matrix<U, A>& m)
   {
     m.check_is_square(m);
-    return xqs_matrix<U, A>(xqs_matrix::diag_to_vvec_tag{}, m);
+    return matrix<U, A>(matrix::diag_to_vvec_tag{}, m);
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> transpose_copy(const xqs_matrix<U, A>& m)
+  friend matrix<U, A> transpose_copy(const matrix<U, A>& m)
   {
-    return xqs_matrix<U, A>(xqs_matrix::transpose_copy_tag{}, m);
+    return matrix<U, A>(matrix::transpose_copy_tag{}, m);
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> transpose_move(xqs_matrix<U, A>& m)
+  friend matrix<U, A> transpose_move(matrix<U, A>& m)
   {
-    return xqs_matrix<U, A>(xqs_matrix::transpose_move_tag{}, std::move(m));
+    return matrix<U, A>(matrix::transpose_move_tag{}, std::move(m));
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> transpose_move(xqs_matrix<U, A>&& m)
+  friend matrix<U, A> transpose_move(matrix<U, A>&& m)
   {
-    return xqs_matrix<U, A>(xqs_matrix::transpose_move_tag{}, std::move(m));
+    return matrix<U, A>(matrix::transpose_move_tag{}, std::move(m));
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> inverse_v1(const xqs_matrix<U, A>& m)
+  friend matrix<U, A> inverse_v1(const matrix<U, A>& m)
   {
     // Based on the ideas from
     // http://www.sanfoundry.com/java-program-find-inverse-matrix/
@@ -1303,11 +1303,11 @@ public:
     const auto N = m.m_row_count;
     const auto N1 = N - 1;
 
-    xqs_matrix<U, A> a{m};
+    matrix<U, A> a{m};
     const auto index = a.gaussian_reduction();
 
     // Update the matrix b[i][j] with the ratios stored
-    auto b = xqs_matrix<U, A>::identity(N);
+    auto b = matrix<U, A>::identity(N);
     for (std::size_t i = 0; i < N1; ++i) {
       auto pi0 = b.m_data + index[i] * b.m_stride;
       for (std::size_t j = i + 1; j < N; ++j) {
@@ -1322,13 +1322,13 @@ public:
     }
 
     // Perform backward substitutions
-    xqs_matrix<U, A> x{N, N};
+    matrix<U, A> x{N, N};
     auto xr = x.m_data + (N - 1) * x.m_stride;
     auto ar = a.m_data + index[N1] * a.m_stride;
     auto br = b.m_data + index[N1] * b.m_stride;
     const auto& aa = ar[N - 1];
     if (aa == zero) {
-      throw std::runtime_error("xqs_matrix: matrix can't be inverted 3");
+      throw std::runtime_error("matrix: matrix can't be inverted 3");
     }
 
     for (std::size_t i = 0; i < N; ++i) {
@@ -1346,7 +1346,7 @@ public:
         }
 
         if (ajrow[j] == zero) {
-          throw std::runtime_error("xqs_matrix: matrix can't be inverted 4");
+          throw std::runtime_error("matrix: matrix can't be inverted 4");
         }
 
         xji /= ajrow[j];
@@ -1356,7 +1356,7 @@ public:
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> inverse_v2(const xqs_matrix<U, A>& m)
+  friend matrix<U, A> inverse_v2(const matrix<U, A>& m)
   {
     m.check_is_square();
 
@@ -1364,14 +1364,14 @@ public:
     const auto N = m.m_row_count;
     const auto N1 = N - 1;
 
-    xqs_matrix<U, A> rm{m};
-    auto im = xqs_matrix<U, A>::identity(N);
+    matrix<U, A> rm{m};
+    auto im = matrix<U, A>::identity(N);
 
     for (std::size_t i = 0; i < N - 1; ++i) {
       auto ri = rm.m_data + i * rm.m_stride;
       auto d = ri + i;
       if (*d == zero) {
-        throw std::logic_error("xqs_matrix: matrix can't be inverted 1");
+        throw std::logic_error("matrix: matrix can't be inverted 1");
       }
       auto ii = im.m_data + i * im.m_stride;
       for (std::size_t col = 0; col < N; ++col) {
@@ -1397,7 +1397,7 @@ public:
     for (auto i = N1; i > 0; ri -= rm.m_stride, ii -= im.m_stride, --i) {
       auto d = ri + i;
       if (*d == zero) {
-        throw std::logic_error("xqs_matrix: matrix can't be inverted 2");
+        throw std::logic_error("matrix: matrix can't be inverted 2");
       }
       for (std::size_t col = 0; col < N; ++col) {
         ri[col] /= *d;
@@ -1420,25 +1420,25 @@ public:
   // Matrix/scalar operations
 
   template <class U, class A>
-  friend xqs_matrix<U, A> operator*(const xqs_matrix<U, A>& lhs, const U& rhs)
+  friend matrix<U, A> operator*(const matrix<U, A>& lhs, const U& rhs)
   {
-    return xqs_matrix<U, A>(xqs_matrix::mult_by_scalar_tag{}, lhs, rhs);
+    return matrix<U, A>(matrix::mult_by_scalar_tag{}, lhs, rhs);
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> operator*(const U& lhs, const xqs_matrix<U, A>& rhs)
+  friend matrix<U, A> operator*(const U& lhs, const matrix<U, A>& rhs)
   {
-    return xqs_matrix<U, A>(xqs_matrix::mult_by_scalar_tag{}, rhs, lhs);
+    return matrix<U, A>(matrix::mult_by_scalar_tag{}, rhs, lhs);
   }
 
   template <class U, class A>
-  friend xqs_matrix<U, A> operator/(const xqs_matrix<U, A>& lhs, const U& rhs)
+  friend matrix<U, A> operator/(const matrix<U, A>& lhs, const U& rhs)
   {
-    return xqs_matrix<U, A>(xqs_matrix::div_by_scalar_tag{}, lhs, rhs);
+    return matrix<U, A>(matrix::div_by_scalar_tag{}, lhs, rhs);
   }
 
   template <class U>
-  xqs_matrix& operator*=(const U& rhs)
+  matrix& operator*=(const U& rhs)
   {
     if (!empty()) [[likely]] {
       auto p = m_data;
@@ -1461,7 +1461,7 @@ public:
   }
 
   template <class U>
-  xqs_matrix& operator/=(const U& rhs)
+  matrix& operator/=(const U& rhs)
   {
     if (!empty()) [[likely]] {
       auto p = m_data;
@@ -1509,50 +1509,50 @@ public:
 
   // Access individual rows
 
-  xqs_matrix operator[](const size_type i) noexcept
+  matrix operator[](const size_type i) noexcept
   {
-    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
-  const xqs_matrix operator[](const size_type i) const noexcept
+  const matrix operator[](const size_type i) const noexcept
   {
-    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
-  xqs_matrix row_at(const size_type i)
+  matrix row_at(const size_type i)
   {
     validate_row_index(i);
-    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
-  const xqs_matrix row_at(const size_type i) const
+  const matrix row_at(const size_type i) const
   {
     validate_row_index(i);
-    return xqs_matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
   }
 
   // Access individual columns
 
-  xqs_matrix operator()(const size_type i) noexcept
+  matrix operator()(const size_type i) noexcept
   {
-    return xqs_matrix(m_data + i, m_row_count, 1, m_stride);
+    return matrix(m_data + i, m_row_count, 1, m_stride);
   }
 
-  const xqs_matrix operator()(const size_type i) const noexcept
+  const matrix operator()(const size_type i) const noexcept
   {
-    return xqs_matrix(m_data + i, m_row_count, 1, m_stride);
+    return matrix(m_data + i, m_row_count, 1, m_stride);
   }
 
-  xqs_matrix column_at(const size_type i)
+  matrix column_at(const size_type i)
   {
     validate_column_index(i);
-    return xqs_matrix(m_data + i, m_row_count, 1, m_stride);
+    return matrix(m_data + i, m_row_count, 1, m_stride);
   }
 
-  const xqs_matrix column_at(const size_type i) const
+  const matrix column_at(const size_type i) const
   {
     validate_column_index(i);
-    return xqs_matrix(m_data + i, m_row_count, 1, m_stride);
+    return matrix(m_data + i, m_row_count, 1, m_stride);
   }
 
   // Access individual elements
@@ -1696,7 +1696,7 @@ public:
   void resize(const size_type new_rows, const size_type new_cols)
   {
     if (!m_is_owner) {
-      throw std::logic_error("xqs_matrix: can't resize a non-owning matrix");
+      throw std::logic_error("matrix: can't resize a non-owning matrix");
     }
 
     const auto new_capacity = validate_dimensions(new_rows, new_cols);
@@ -1782,7 +1782,7 @@ public:
   {
     if (!m_is_owner) {
       throw std::logic_error(
-        "xqs_matrix: can't reserve capacity in a non-owning matrix");
+        "matrix: can't reserve capacity in a non-owning matrix");
     }
 
     if (new_capacity > m_capacity) {
@@ -1857,7 +1857,7 @@ public:
   {
     if (!m_is_owner) {
       throw std::logic_error(
-        "xqs_matrix: can't shrink to fit in a non-owning matrix");
+        "matrix: can't shrink to fit in a non-owning matrix");
     }
 
     const size_type new_capacity = m_row_count * m_col_count;
@@ -1943,7 +1943,7 @@ public:
     return dest;
   }
 
-  xqs_matrix window(
+  matrix window(
     const size_type row,
     const size_type col,
     const size_type row_count,
@@ -1953,14 +1953,14 @@ public:
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
     validate_column_index(col + column_count - 1);
-    return xqs_matrix(
+    return matrix(
       m_data + row * m_stride + col,
       row_count,
       column_count,
       m_stride);
   }
 
-  xqs_matrix copy_window(
+  matrix copy_window(
     const size_type row,
     const size_type col,
     const size_type row_count,
@@ -1970,7 +1970,7 @@ public:
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
     validate_column_index(col + column_count - 1);
-    xqs_matrix result{row_count, column_count};
+    matrix result{row_count, column_count};
     if (!result.empty()) {
       auto s = m_data + row * m_stride + col;
       auto d = result.m_data;
@@ -1982,7 +1982,7 @@ public:
     return result;
   }
 
-  xqs_matrix move_window(
+  matrix move_window(
     const size_type row,
     const size_type col,
     const size_type row_count,
@@ -1992,7 +1992,7 @@ public:
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
     validate_column_index(col + column_count - 1);
-    xqs_matrix result{row_count, column_count};
+    matrix result{row_count, column_count};
     if (!result.empty()) {
       auto s = m_data + row * m_stride + col;
       auto d = result.m_data;
@@ -2015,23 +2015,23 @@ public:
 private:
 
   // Check that matrices have equal dimensions
-  void check_equal_dimensions(const xqs_matrix<T>& other) const
+  void check_equal_dimensions(const matrix<T>& other) const
   {
     if (m_row_count == other.m_row_count &&
         m_col_count == other.m_col_count) [[likely]] return;
     std::ostringstream err;
-    err << "xqs_matrix: dimensions of the other matrix differ "
+    err << "matrix: dimensions of the other matrix differ "
         << m_row_count << '*' << m_col_count << " vs "
         << other.m_row_count << '*' << other.m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
 
   // Check that matrix has dimensions that are suitable for product oeration
-  void check_suitable_for_product(const xqs_matrix<T>& other) const
+  void check_suitable_for_product(const matrix<T>& other) const
   {
     if (m_col_count == other.m_row_count) [[likely]] return;
     std::ostringstream err;
-    err << "xqs_matrix: dimensions of the other matrix are not suitable"
+    err << "matrix: dimensions of the other matrix are not suitable"
             " for the product [this * other] ("
         << m_row_count << '*' << m_col_count << " vs "
         << other.m_row_count << '*' << other.m_col_count << ')';
@@ -2043,7 +2043,7 @@ private:
   {
     if (m_row_count == m_col_count) [[unlikely]] return;
     std::ostringstream err;
-    err << "xqs_matrix: matrix is not square ("
+    err << "matrix: matrix is not square ("
         << m_row_count << '*' << m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
@@ -2053,7 +2053,7 @@ private:
   {
     if (row < m_row_count) [[likely]] return;
     std::ostringstream err;
-    err << "xqs_matrix: row index " << row << " is out of range ("
+    err << "matrix: row index " << row << " is out of range ("
         << m_row_count << ')';
     throw std::invalid_argument(err.str());
   }
@@ -2063,7 +2063,7 @@ private:
   {
     if (col < m_col_count) [[likely]] return;
     std::ostringstream err;
-    err << "xqs_matrix: column index " << col << " is out of range ("
+    err << "matrix: column index " << col << " is out of range ("
         << m_col_count << ')';
     throw std::invalid_argument(err.str());
   }
@@ -2075,12 +2075,12 @@ private:
   {
     if (row_count == 0 || column_count == 0) [[unlikely]] return 0;
     if (column_count > max_size() / row_count) [[unlikely]] {
-      throw std::length_error("xqs_matrix: matrix size is too large");
+      throw std::length_error("matrix: matrix size is too large");
     }
     return row_count * column_count;
   }
 
-  void do_move_assign(xqs_matrix&& rhs) noexcept
+  void do_move_assign(matrix&& rhs) noexcept
   {
     if (m_is_owner) delete[] m_data;
 
@@ -2130,7 +2130,7 @@ private:
           const auto ii = index[i];
           auto pi0 = std::abs(ppj[ii * m_stride]);
           if (c[ii] == zero) [[unlikely]] {
-            throw std::runtime_error("xqs_matrix: matrix can't be inverted 5");
+            throw std::runtime_error("matrix: matrix can't be inverted 5");
           }
           pi0 /= c[ii];
           if (pi0 > pi1) {
@@ -2144,7 +2144,7 @@ private:
         const auto row0 = m_data + index[j] * m_stride;
         const auto& v = row0[j];
         if (v == zero) [[unlikely]] {
-          throw std::runtime_error("xqs_matrix: matrix can't be inverted 6");
+          throw std::runtime_error("matrix: matrix can't be inverted 6");
         }
 
         for (auto i = j + 1; i < N; ++i) {
@@ -2193,7 +2193,7 @@ private:
 // ***** end of class *****
 
 template <typename T, class Alloc>
-inline void swap(xqs_matrix<T, Alloc>& a, xqs_matrix<T, Alloc>& b) noexcept
+inline void swap(matrix<T, Alloc>& a, matrix<T, Alloc>& b) noexcept
 {
   a.swap(b);
 }
@@ -2202,7 +2202,7 @@ inline void swap(xqs_matrix<T, Alloc>& a, xqs_matrix<T, Alloc>& b) noexcept
 template<class T, class Alloc, class Ch, class Traits>
 std::basic_ostream<Ch, Traits>& operator<<(
   std::basic_ostream<Ch, Traits>& os,
-  const xqs_matrix<T, Alloc>& m)
+  const matrix<T, Alloc>& m)
 {
   typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
 
@@ -2243,7 +2243,7 @@ std::basic_ostream<Ch, Traits>& operator<<(
 template<class T, class Alloc, class Ch, class Traits>
 std::basic_istream<Ch, Traits>& operator>>(
   std::basic_istream<Ch, Traits>& is,
-  xqs_matrix<T, Alloc>& m)
+  matrix<T, Alloc>& m)
 {
   typename std::basic_istream<Ch, Traits>::sentry sentry(is);
 
@@ -2277,14 +2277,14 @@ template <
     typename Traits,
     typename Converter
 >
-xqs_matrix<T, Alloc> read_csv(
+matrix<T, Alloc> read_csv(
   const std::filesystem::path& path,
   const Ch line_delim,
   const std::basic_string_view<Ch, Traits>& field_delims,
   const Converter& conv,
   const bool has_header_line = true)
 {
-  xqs_matrix<T, Alloc> result;
+  matrix<T, Alloc> result;
 
   // Open input file
   std::basic_ifstream<Ch, Traits> in(path.c_str());
@@ -2332,4 +2332,4 @@ xqs_matrix<T, Alloc> read_csv(
 
 } // namespace stdx
 
-#endif // XQS_MATRIX_H__
+#endif // matrix_H__
