@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef MATRIX_H__
-#define MATRIX_H__
-
 // CRT
 #include <cmath>
 
@@ -2329,5 +2326,3 @@ matrix<T, Alloc> read_csv(
 }
 
 } // namespace stdx
-
-#endif // MATRIX_H__
