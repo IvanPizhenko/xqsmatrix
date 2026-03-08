@@ -27,9 +27,7 @@
 // THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef MATRIX_NO_PRAGMA_ONCE
 #pragma once
-#endif
 
 #ifndef MATRIX_H__
 #define MATRIX_H__
