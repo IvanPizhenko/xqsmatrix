@@ -27,12 +27,12 @@
 // THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef matrix_NO_PRAGMA_ONCE
+#ifndef MATRIX_NO_PRAGMA_ONCE
 #pragma once
 #endif
 
-#ifndef matrix_H__
-#define matrix_H__
+#ifndef MATRIX_H__
+#define MATRIX_H__
 
 // CRT
 #include <cmath>
@@ -284,7 +284,7 @@ public:
   }
 #endif
 
-matrix(const matrix& src) :
+  matrix(const matrix& src) :
     m_capacity(src.size()),
     m_data(src.m_is_owner
       ? (m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr)
@@ -2332,4 +2332,4 @@ matrix<T, Alloc> read_csv(
 
 } // namespace stdx
 
-#endif // matrix_H__
+#endif // MATRIX_H__
