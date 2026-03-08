@@ -18,8 +18,12 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
 # THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-###############################################################################
+############################################################25###################
 
-CMAKE_MINIMUM_REQURED(3.28)
+cmake_minimum_required(VERSION 3.25)
 
-# TODO
+add_executable(
+    mtest
+    mtest.cpp
+    matrix.h
+)
