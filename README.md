@@ -53,13 +53,13 @@ and source of some ideas.
    - [x] is_owner()
    - [x] is_view()
 
-7. Row and column access:
+6. Row and column access:
    - [x] operator[](row)
    - [x] row_at(row)
    - [x] operator()(column)
    - [x] column_at(column)
 
-6. Element access:
+7. Element access:
    - [x] operator()(row, column)
    - [x] operator()(pair<row, column>)
    - [x] operator[](pair<row, column>)
