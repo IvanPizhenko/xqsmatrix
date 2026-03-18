@@ -1482,7 +1482,10 @@ public:
   void insert_columns(
       size_type pos,
       size_type count = 1,
-      const_reference v = T());
+      const_reference v = T())
+      {
+        // TODO: implement
+      }
 
   // Remove "count" columns at postion "pos"
   void remove_columns(size_type pos, size_type count = 1)
