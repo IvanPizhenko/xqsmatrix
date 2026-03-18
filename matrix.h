@@ -1504,50 +1504,50 @@ public:
 
   // Access individual rows
 
-  matrix operator[](const size_type i) noexcept
+  matrix operator[](const size_type row) noexcept
   {
-    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    return matrix(m_data + row * m_stride, 1, m_col_count, m_stride);
   }
 
-  const matrix operator[](const size_type i) const noexcept
+  const matrix operator[](const size_type row) const noexcept
   {
-    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    return matrix(m_data + row * m_stride, 1, m_col_count, m_stride);
   }
 
-  matrix row_at(const size_type i)
+  matrix row_at(const size_type row)
   {
-    validate_row_index(i);
-    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    validate_row_index(row);
+    return matrix(m_data + row * m_stride, 1, m_col_count, m_stride);
   }
 
-  const matrix row_at(const size_type i) const
+  const matrix row_at(const size_type row) const
   {
-    validate_row_index(i);
-    return matrix(m_data + i * m_stride, 1, m_col_count, m_stride);
+    validate_row_index(row);
+    return matrix(m_data + row * m_stride, 1, m_col_count, m_stride);
   }
 
   // Access individual columns
 
-  matrix operator()(const size_type i) noexcept
+  matrix operator()(const size_type col) noexcept
   {
-    return matrix(m_data + i, m_row_count, 1, m_stride);
+    return matrix(m_data + col, m_row_count, 1, m_stride);
   }
 
-  const matrix operator()(const size_type i) const noexcept
+  const matrix operator()(const size_type col) const noexcept
   {
-    return matrix(m_data + i, m_row_count, 1, m_stride);
+    return matrix(m_data + col, m_row_count, 1, m_stride);
   }
 
-  matrix column_at(const size_type i)
+  matrix column_at(const size_type col)
   {
-    validate_column_index(i);
-    return matrix(m_data + i, m_row_count, 1, m_stride);
+    validate_column_index(col);
+    return matrix(m_data + col, m_row_count, 1, m_stride);
   }
 
-  const matrix column_at(const size_type i) const
+  const matrix column_at(const size_type col) const
   {
-    validate_column_index(i);
-    return matrix(m_data + i, m_row_count, 1, m_stride);
+    validate_column_index(col);
+    return matrix(m_data + col, m_row_count, 1, m_stride);
   }
 
   // Access individual elements
