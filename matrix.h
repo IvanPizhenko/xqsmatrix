@@ -1485,7 +1485,10 @@ public:
       const_reference v = T());
 
   // Remove "count" columns at postion "pos"
-  void remove_columns(size_type pos, size_type count = 1);
+  void remove_columns(size_type pos, size_type count = 1)
+  {
+    // TODO: implement
+  }
 
   // Fix elements to zero
   void fix_to_zero(const_reference threshold)
