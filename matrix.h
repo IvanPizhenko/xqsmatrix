@@ -1678,23 +1678,23 @@ public:
 
   // Resize
 
-  void resize_rows(const size_type new_rows)
+  void resize_rows(const size_type new_row_count)
   {
-    resize(new_rows, m_col_count);
+    resize(new_row_count, m_col_count);
   }
 
-  void resize_columns(const size_type new_cols)
+  void resize_columns(const size_type new_col_count)
   {
-    resize(m_row_count, new_cols);
+    resize(m_row_count, new_col_count);
   }
 
-  void resize(const size_type new_rows, const size_type new_cols)
+  void resize(const size_type new_row_count, const size_type new_col_count)
   {
     if (!m_is_owner) {
       throw std::logic_error("matrix: can't resize a non-owning matrix");
     }
 
-    const auto new_capacity = validate_dimensions(new_rows, new_cols);
+    const auto new_capacity = validate_dimensions(new_row_count, new_col_count);
     if (new_capacity > m_capacity) {
       auto new_data = new_capacity != 0
           ? m_allocator.allocate(new_capacity)
@@ -1714,13 +1714,13 @@ public:
 
           // Copy existing data
           if (m_data != nullptr) {
-            const auto min_rows = std::min(m_row_count, new_rows);
-            const auto min_cols = std::min(m_col_count, new_cols);
+            const auto min_rows = std::min(m_row_count, new_row_count);
+            const auto min_cols = std::min(m_col_count, new_col_count);
             for (size_type r = 0; r < min_rows; ++r) {
               std::copy_n(
                 m_data + r * m_stride,
                 min_cols,
-                new_data + r * new_cols);
+                new_data + r * new_col_count);
             }
           }
         } catch (...) {
@@ -1746,15 +1746,15 @@ public:
 
       m_data = new_data;
       m_capacity = new_capacity;
-    } else if (new_cols != m_col_count) {
+    } else if (new_col_count != m_col_count) {
       // Adjust existing data to the new column count
-      const auto min_rows = std::min(m_row_count, new_rows);
-      const auto min_cols = std::min(m_col_count, new_cols);
-      if (new_cols < m_col_count) {
+      const auto min_rows = std::min(m_row_count, new_row_count);
+      const auto min_cols = std::min(m_col_count, new_col_count);
+      if (new_col_count < m_col_count) {
         auto ps = m_data;
         const auto pse = m_data + min_rows * m_stride;
         auto pd = m_data;
-        for (; ps != pse; ps += m_stride, pd += new_cols) {
+        for (; ps != pse; ps += m_stride, pd += new_col_count) {
           std::copy_n(ps, min_cols, pd);
         }
       } else {
@@ -1762,15 +1762,15 @@ public:
         auto pd = m_data;
         // TODO: recheck carefully for loop condition correctness
         for (size_type r = min_rows; ps > m_data;
-             ps -= m_stride, pd += new_cols) {
+             ps -= m_stride, pd += new_col_count) {
           std::copy_n(ps, min_cols, pd);
         }
       }
     }
 
-    m_row_count = new_rows;
-    m_col_count = new_cols;
-    m_stride = new_cols;
+    m_row_count = new_row_count;
+    m_col_count = new_col_count;
+    m_stride = new_col_count;
   }
 
   void reserve(const size_type new_capacity)
