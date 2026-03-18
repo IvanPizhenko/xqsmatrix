@@ -112,12 +112,12 @@ public:
   {
   }
 
-  explicit matrix(const size_type row_count, const size_type column_count) :
-    m_capacity(validate_dimensions(row_count, column_count)),
+  explicit matrix(const size_type row_count, const size_type col_count) :
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -144,15 +144,15 @@ public:
 
   matrix(
       const size_type row_count,
-      const size_type column_count,
+      const size_type col_count,
       const_reference v,
       const Alloc& allocator = Alloc()) :
     m_allocator(allocator),
-    m_capacity(validate_dimensions(row_count, column_count)),
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -182,14 +182,14 @@ public:
       InputIt first,
       InputIt last,
       const size_type row_count,
-      const size_type column_count,
+      const size_type col_count,
       const Alloc& allocator = Alloc()) :
     m_allocator(allocator),
-    m_capacity(validate_dimensions(row_count, column_count)),
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -230,14 +230,14 @@ public:
       [[maybe_unused]] std::from_range_t tag,
       Range&& r,
       const size_type row_count,
-      const size_type column_count,
+      const size_type col_count,
       const Alloc& allocator = Alloc()) :
     m_allocator(allocator),
-    m_capacity(validate_dimensions(row_count, column_count)),
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -377,12 +377,12 @@ public:
   matrix(
       T* const data,
       const size_type row_count,
-      const size_type column_count,
+      const size_type col_count,
       const size_type stride) noexcept :
     m_capacity(0),
     m_data(data),
     m_row_count(row_count),
-    m_col_count(column_count),
+    m_col_count(col_count),
     m_stride(stride),
     m_is_owner(false)
   {
@@ -391,14 +391,14 @@ public:
   matrix(
       std::initializer_list<T> init,
       const size_type row_count,
-      const size_type column_count,
+      const size_type col_count,
       const Alloc& allocator = Alloc()) :
     m_allocator(allocator),
-    m_capacity(validate_dimensions(row_count, column_count)),
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (m_data == nullptr) [[unlikely]] return;
@@ -983,19 +983,19 @@ private:
       const size_type row_offset,
       const size_type column_offset,
       const size_type row_count,
-      const size_type column_count) :
-    m_capacity(validate_dimensions(row_count, column_count)),
+      const size_type col_count) :
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
     auto p = m_data;
     auto s = src.m_data + row_offset * src.m_stride + column_offset;
     if (std::is_trivial_v<T>) {
-      for (size_type i = 0; i < row_count; p += column_count,
+      for (size_type i = 0; i < row_count; p += col_count,
            s += src.m_stride, ++i) {
         std::uninitialized_copy_n(s, 1, p);
       }
@@ -1004,7 +1004,7 @@ private:
         const auto e = m_data + m_capacity;
         for (size_type i = 0; i < row_count; s += src.m_stride, ++i) {
           auto ss = s;
-          const auto se = ss + column_count;
+          const auto se = ss + col_count;
           for (; ss != se; ++p, ++ss) {
             std::construct_at(p, *ss);
           }
@@ -1024,12 +1024,12 @@ private:
       const size_type row_offset,
       const size_type column_offset,
       const size_type row_count,
-      const size_type column_count) :
-    m_capacity(validate_dimensions(row_count, column_count)),
+      const size_type col_count) :
+    m_capacity(validate_dimensions(row_count, col_count)),
     m_data(m_capacity != 0 ? m_allocator.allocate(m_capacity) : nullptr),
     m_row_count(row_count),
-    m_col_count(column_count),
-    m_stride(column_count),
+    m_col_count(col_count),
+    m_stride(col_count),
     m_is_owner(true)
   {
     if (empty()) [[unlikely]] return;
@@ -1038,7 +1038,7 @@ private:
     auto s = src.m_data + row_offset * src.m_stride + column_offset;
     if (std::is_trivial_v<T>) {
       for (size_type i = 0; i < row_count;
-           p += column_count, s += src.m_stride, ++i) {
+           p += col_count, s += src.m_stride, ++i) {
         std::uninitialized_copy_n(s, 1, p);
       }
       return;
@@ -1048,7 +1048,7 @@ private:
       const auto e = m_data + m_capacity;
       for (size_type i = 0; i < row_count; s += src.m_stride, ++i) {
         auto ss = s;
-        const auto se = ss + column_count;
+        const auto se = ss + col_count;
         for (; ss != se; ++p, ++ss) {
           std::construct_at(p, std::move(*ss));
         }
@@ -1622,7 +1622,7 @@ public:
     return m_row_count;
   }
 
-  size_type column_count() const noexcept
+  size_type col_count() const noexcept
   {
     return m_col_count;
   }
@@ -1942,16 +1942,16 @@ public:
     const size_type row,
     const size_type col,
     const size_type row_count,
-    const size_type column_count) const
+    const size_type col_count) const
   {
     validate_row_index(row);
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
-    validate_column_index(col + column_count - 1);
+    validate_column_index(col + col_count - 1);
     return matrix(
       m_data + row * m_stride + col,
       row_count,
-      column_count,
+      col_count,
       m_stride);
   }
 
@@ -1959,19 +1959,19 @@ public:
     const size_type row,
     const size_type col,
     const size_type row_count,
-    const size_type column_count) const
+    const size_type col_count) const
   {
     validate_row_index(row);
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
-    validate_column_index(col + column_count - 1);
-    matrix result{row_count, column_count};
+    validate_column_index(col + col_count - 1);
+    matrix result{row_count, col_count};
     if (!result.empty()) {
       auto s = m_data + row * m_stride + col;
       auto d = result.m_data;
       for (size_type r = 0; r < row_count;
-           s += m_stride, d += column_count, ++r) {
-        std::copy_n(s, column_count, d);
+           s += m_stride, d += col_count, ++r) {
+        std::copy_n(s, col_count, d);
       }
     }
     return result;
@@ -1981,23 +1981,23 @@ public:
     const size_type row,
     const size_type col,
     const size_type row_count,
-    const size_type column_count)
+    const size_type col_count)
   {
     validate_row_index(row);
     validate_column_index(col);
     validate_row_index(row + row_count - 1);
-    validate_column_index(col + column_count - 1);
-    matrix result{row_count, column_count};
+    validate_column_index(col + col_count - 1);
+    matrix result{row_count, col_count};
     if (!result.empty()) {
       auto s = m_data + row * m_stride + col;
       auto d = result.m_data;
       for (size_type r = 0; r < row_count;
-           s += m_stride, d += column_count, ++r) {
+           s += m_stride, d += col_count, ++r) {
         // Unfortunately, there is no std::move_n()
         if constexpr (std::is_trivially_copyable_v<T>) {
-          std::copy_n(s, column_count, d);
+          std::copy_n(s, col_count, d);
         } else {
-          auto de = d + column_count;
+          auto de = d + col_count;
           for (; d != de; ++s, ++d) {
             *d = std::move(*s);
           }
@@ -2066,13 +2066,13 @@ private:
   // Initial validation of dimensions
   static size_type validate_dimensions(
       const size_type row_count,
-      const size_type column_count)
+      const size_type col_count)
   {
-    if (row_count == 0 || column_count == 0) [[unlikely]] return 0;
-    if (column_count > max_size() / row_count) [[unlikely]] {
+    if (row_count == 0 || col_count == 0) [[unlikely]] return 0;
+    if (col_count > max_size() / row_count) [[unlikely]] {
       throw std::length_error("matrix: matrix size is too large");
     }
-    return row_count * column_count;
+    return row_count * col_count;
   }
 
   void do_move_assign(matrix&& rhs) noexcept
@@ -2202,13 +2202,13 @@ std::basic_ostream<Ch, Traits>& operator<<(
   typename std::basic_ostream<Ch, Traits>::sentry sentry(os);
 
   const auto row_count = m.row_count();
-  const auto column_count = m.column_count();
+  const auto col_count = m.col_count();
 
   os << row_count;
   if (!os) [[unlikely]] return os;
   os << Ch('\t');
   if (!os) [[unlikely]] return os;
-  os << column_count;
+  os << col_count;
   if (!os) [[unlikely]] return os;
   os << Ch('\n');
   if (!os) [[unlikely]] return os;
@@ -2218,7 +2218,7 @@ std::basic_ostream<Ch, Traits>& operator<<(
   const auto p0e = p0 + row_count * stride;
   for (; p0 != p0e; p0 += stride) {
     auto p = p0;
-    const auto pe = p + column_count;
+    const auto pe = p + col_count;
     os << *p;
     if (!os) [[unlikely]] return os;
     for (++p; p != pe; ++p) {
@@ -2242,19 +2242,19 @@ std::basic_istream<Ch, Traits>& operator>>(
 {
   typename std::basic_istream<Ch, Traits>::sentry sentry(is);
 
-  std::size_t row_count, column_count;
+  std::size_t row_count, col_count;
   is >> row_count;
   if (!is) [[unlikely]] return is;
-  is >> column_count;
+  is >> col_count;
   if (!is) [[unlikely]] return is;
-  m.resize(row_count, column_count);
+  m.resize(row_count, col_count);
 
   auto p0 = m.data();
   const auto stride = m.stride();
   const auto p0e = p0 + row_count * stride;
   for (; p0 != p0e; p0 += stride) {
     auto p = p0;
-    const auto pe = p + column_count;
+    const auto pe = p + col_count;
     for (; p != pe; ++p) {
       is >> *p;
       if (!is) [[unlikely]] return is;
@@ -2313,7 +2313,7 @@ matrix<T, Alloc> read_csv(
     if (row.empty()) throw std::runtime_error("read_csv: empty data line");
     if (result.m_col_count != row.size()) {
       if (result.m_col_count < row.size()) {
-        result.column_count(row.size());
+        result.col_count(row.size());
       } else {
         row.resize(result.m_col_count);
       }
