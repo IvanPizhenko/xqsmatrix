@@ -2199,7 +2199,6 @@ inline void swap(matrix<T, Alloc>& a, matrix<T, Alloc>& b) noexcept
   a.swap(b);
 }
 
-
 template<class T, class Alloc, class Ch, class Traits>
 std::basic_ostream<Ch, Traits>& operator<<(
   std::basic_ostream<Ch, Traits>& os,
