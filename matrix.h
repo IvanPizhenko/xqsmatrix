@@ -1640,7 +1640,7 @@ public:
 
   static constexpr size_type max_size() noexcept
   {
-    return (std::numeric_limits<size_type>::max() / 2) / sizeof(T);
+    return std::vector<T, Alloc>::max_size();
   }
 
   bool empty() const noexcept
