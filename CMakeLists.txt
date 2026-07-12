@@ -26,4 +26,5 @@ add_executable(
     mtest
     mtest.cpp
     matrix.h
+    matrix_csv_io.h
 )
