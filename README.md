@@ -28,8 +28,7 @@ and source of some ideas.
    - [x] Constructor with row and column counts and initial value.
    - [x] Constructor with allocator.
    - [x] Constructor with allocator, row and column counts.
-   - [x] Constructor with allocator, row and column counts
-         and initial value.
+   - [x] Constructor with allocator, row and column counts and initial value.
    - [x] Constructor from range defined by iterators.
    - [x] Constructor from range object.
    - [x] Copy constructor.
