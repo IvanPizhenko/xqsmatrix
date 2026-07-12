@@ -222,7 +222,7 @@ public:
     }
   }
 
-#if __cplusplus > 202002L // C++23
+#if __cplusplus >= 202302L // C++23
   template <typename Range>
   matrix(
       [[maybe_unused]] std::from_range_t tag,
