@@ -34,8 +34,6 @@
 
 // STL
 #include <algorithm>
-#include <filesystem>
-#include <fstream>
 #include <memory>
 #include <numeric>
 #include <stdexcept>
@@ -2268,67 +2266,6 @@ std::basic_istream<Ch, Traits>& operator>>(
   }
 
   return is;
-}
-
-
-template <
-    typename T,
-    typename Alloc,
-    typename Ch,
-    typename Traits,
-    typename Converter
->
-matrix<T, Alloc> read_csv(
-  const std::filesystem::path& path,
-  const Ch line_delim,
-  const std::basic_string_view<Ch, Traits>& field_delims,
-  const Converter& conv,
-  const bool has_header_line = true)
-{
-  matrix<T, Alloc> result;
-
-  // Open input file
-  std::basic_ifstream<Ch, Traits> in(path.c_str());
-  if (!in.is_open()) {
-    throw std::runtime_error("read_csv: can't open input file");
-  }
-
-  std::string line;
-
-  // Skip header lines
-  std::size_t col_count = 0;
-  if (has_header_line) {
-    std::getline(in, line, line_delim);
-    if (!in) throw std::runtime_error("read_csv: can't read file header");
-    col_count = std::count_if(
-      line.cbegin(),
-      line.cend(),
-      [&field_delims](const Ch c) noexcept
-      {
-         return field_delims.find(c) !=
-                std::basic_string_view<Ch, Traits>::npos;
-      }
-    ) + 1;
-  }
-
-  // Parse data lines
-  std::size_t row_count = 0;
-  while (std::getline(in, line, line_delim)) {
-    ++row_count;
-    auto row = parse_vector(line, conv, field_delims);
-    if (row.empty()) throw std::runtime_error("read_csv: empty data line");
-    if (result.m_col_count != row.size()) {
-      if (result.m_col_count < row.size()) {
-        result.col_count(row.size());
-      } else {
-        row.resize(result.m_col_count);
-      }
-    }
-    result.m_data.push_back(std::move(row));
-    ++result.m_row_count;
-  }
-
-  return result;
 }
 
 } // namespace stdx
