@@ -39,7 +39,6 @@
 #include <stdexcept>
 #include <sstream>
 #include <type_traits>
-#include <vector>
 
 namespace stdx {
 
@@ -1638,7 +1637,9 @@ public:
 
   static constexpr size_type max_size() noexcept
   {
-    return std::vector<T, Alloc>::max_size();
+    return std::min(
+      static_cast<size_type>(std::numeric_limits<std::ptrdiff_t>::max()),
+      std::allocator<T>::max_size(m_allocator));
   }
 
   bool empty() const noexcept
