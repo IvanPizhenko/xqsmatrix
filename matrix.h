@@ -1635,7 +1635,7 @@ public:
     return m_row_count * m_col_count;
   }
 
-  static constexpr size_type max_size() noexcept
+  constexpr size_type max_size() noexcept
   {
     return std::min(
       static_cast<size_type>(std::numeric_limits<std::ptrdiff_t>::max()),
