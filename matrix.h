@@ -1639,7 +1639,8 @@ public:
   {
     return std::min(
       static_cast<size_type>(std::numeric_limits<std::ptrdiff_t>::max()),
-      std::allocator<T>::max_size(m_allocator));
+      std::allocator<T>::max_size(m_allocator)
+    );
   }
 
   bool empty() const noexcept
