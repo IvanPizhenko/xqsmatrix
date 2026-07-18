@@ -71,8 +71,8 @@ matrix<T, Alloc> read_csv(
       line.cend(),
       [&field_delims](const Ch c) noexcept
       {
-         return field_delims.find(c) !=
-                std::basic_string_view<Ch, Traits>::npos;
+        return field_delims.find(c) !=
+               std::basic_string_view<Ch, Traits>::npos;
       }
     ) + 1;
   }
