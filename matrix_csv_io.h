@@ -38,11 +38,11 @@
 namespace stdx {
 
 template <
-    typename T,
-    typename Alloc,
-    typename Ch,
-    typename Traits,
-    typename Converter
+  typename T,
+  typename Alloc,
+  typename Ch,
+  typename Traits,
+  typename Converter
 >
 matrix<T, Alloc> read_csv(
   const std::filesystem::path& path,
